@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">My Notes</string>
+    <string name="welcome">Welcome!</string>
+    <string name="sign_in_to_continue">Sign in to continue</string>
+    <string name="mustFill">Form Tidak Boleh Kosong</string>
+    <string name="mustFillPassword">Password Tidak Boleh Kosong</string>
+    <string name="mustFillConfirmPass">Confirm Password Tidak Boleh Kosong</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login_text">This app helps you quickly record all your ideas and stories. With the Notebook app, you can create all your notes, checklists and store your beliefs, passwords or important information.</string>
+    <string-array name="label_image_source">
+        <item>Take from camera</item>
+        <item>Insert from gallery</item>
+    </string-array>
+</resources>
