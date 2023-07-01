@@ -45,6 +45,7 @@ class FavouriteActivity :
         super.onCreate(savedInstanceState)
 
         getNoteFavourite()
+        observe()
         binding.rvNote.adapter = adapterNote
 
     }

@@ -229,7 +229,7 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
 
     private fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.coordinator, fragment)
+            .replace(R.id.constraint, fragment)
             .commit()
     }
 
