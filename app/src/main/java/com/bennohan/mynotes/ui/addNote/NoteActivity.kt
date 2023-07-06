@@ -1,16 +1,18 @@
 package com.bennohan.mynotes.ui.addNote
 
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
+import android.text.SpannableStringBuilder
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
-import android.widget.TextView
-import androidx.core.content.ContextCompat
+import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -20,50 +22,71 @@ import com.bennohan.mynotes.database.Categories
 import com.bennohan.mynotes.database.Const
 import com.bennohan.mynotes.database.Note
 import com.bennohan.mynotes.databinding.ActivityNoteBinding
+import com.bennohan.mynotes.helper.ViewBindingHelper.Companion.writeBitmap
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.crocodic.core.api.ApiStatus
-import com.crocodic.core.extension.snacked
-import com.crocodic.core.extension.textOf
-import com.crocodic.core.extension.tos
+import com.crocodic.core.extension.*
+import com.crocodic.core.helper.BitmapHelper
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 //TODO BTN UNDO REDO
 class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.activity_note) {
 
+    //Data
     private var dataCategories = ArrayList<Categories?>()
     private var dataNote: Note? = null
     private var idCategories: String? = null
+    private var filePhoto: File? = null
+    private var dateFormatted : String? = null
+
+    //View for Keyboard
+    private lateinit var rootView: View
+
+    //For Redo Undo Button
+    private lateinit var textWatcher: TextWatcher
+    private lateinit var textHistory: MutableList<CharSequence>
+    private var currentPosition = 0
+
+    private val cameraOption: Array<String> = arrayOf("take from camera 1", "insert from gallery 2")
+    private var isTextChangedByUser = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        rootView = findViewById(android.R.id.content)
+
+
         listCategory()
         observe()
         getNote()
-//        autocompleteSpinner()
+//        keyboardTop()
+        autocompleteSpinner()
+        setDateTime()
+        undoRedo()
 
-        binding.btnBack.setOnClickListener {
-            finish()
+        setupTextWatcher(binding.etTitle,binding.etContent)
+
+        binding.btnShareNote.setOnClickListener {
+            shareText(dataNote?.title, dataNote?.content)
         }
 
-//        binding.btnShareNote.setOnClickListener {
-//            shareText(dataNote?.title, dataNote?.content)
-//        }
-//
-//        binding.btnFavourite.setOnClickListener {
-//            favourite()
-//        }
-//
-//        binding.btnUndo.setOnClickListener {
-//            undo()
-//        }
-//        binding.btnRedo.setOnClickListener {
-//            redo()
-//        }
+        binding.btnFavourite.setOnClickListener {
+            favourite()
+        }
+
+        binding.btnPhoto.setOnClickListener {
+            openPictureDialog()
+
+        }
 
         binding.btnBack.setOnClickListener {
             onBackPressed()
@@ -73,28 +96,91 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
             createUpdateNote()
         }
 
-//        val editText = findViewById<EditText>()
-        val undoStack = mutableListOf<String>()
-        val redoStack = mutableListOf<String>()
+        binding.btnDelete.setOnClickListener {
+            deleteNote()
+        }
 
-//        editText.addTextChangedListener(object : TextWatcher {
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-//
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-//
-//            override fun afterTextChanged(s: Editable?) {
-//                // Save the current text to the undo stack
-//                undoStack.add(s.toString())
-//            }
-//        })
     }
+
 
     private fun listCategory() {
         viewModel.getCategory()
     }
 
 
+    private fun undoRedo() {
+        textHistory = mutableListOf()
+        textWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                // Add the current text to the history
+                if (s != null) {
+                    textHistory.add(s.toString())
+                    currentPosition = textHistory.size - 1
+                }
+            }
+        }
+
+        binding.etContent.addTextChangedListener(textWatcher)
+
+        binding.btnUndo.setOnClickListener {
+            if (currentPosition > 0) {
+                currentPosition--
+                binding.etContent.removeTextChangedListener(textWatcher)
+                binding.etContent.text = SpannableStringBuilder.valueOf(textHistory[currentPosition])
+                binding.etContent.addTextChangedListener(textWatcher)
+                Toast.makeText(this, "Undo", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.btnRedo.setOnClickListener {
+            if (currentPosition < textHistory.size - 1) {
+                currentPosition++
+                binding.etContent.removeTextChangedListener(textWatcher)
+                binding.etContent.text = SpannableStringBuilder.valueOf(textHistory[currentPosition])
+                binding.etContent.addTextChangedListener(textWatcher)
+                Toast.makeText(this, "Redo", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+    private fun deleteNote() {
+        val idNote = dataNote?.id
+        viewModel.deleteNote(idNote)
+    }
+
+
+    private fun keyboardTop() {
+        val viewTreeObserver = rootView.viewTreeObserver
+        viewTreeObserver.addOnGlobalLayoutListener {
+            val rect = Rect()
+            rootView.getWindowVisibleDisplayFrame(rect)
+
+            // Calculate the height difference between the root view and the visible display frame
+            val heightDiff = rootView.height - rect.height()
+
+            // Check if the height difference is above a certain threshold to determine if the keyboard is visible
+            val keyboardVisible = heightDiff > (rootView.height * 0.15)
+
+            if (keyboardVisible) {
+                // Keyboard is visible, adjust the position of the id/WYSIWYG view here
+                val layoutParams = binding.WYSIWYG.layoutParams as ConstraintLayout.LayoutParams
+                layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                binding.WYSIWYG.layoutParams = layoutParams
+            } else {
+                // Keyboard is not visible, reset the position of the id/WYSIWYG view here
+                val layoutParams = binding.WYSIWYG.layoutParams as ConstraintLayout.LayoutParams
+                layoutParams.topToBottom =
+                    R.id.etContent // Set the correct anchor for the top constraint
+                binding.WYSIWYG.layoutParams = layoutParams
+            }
+        }
+
+    }
 
 
 
@@ -110,29 +196,24 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
 
     private fun getNote() {
         val id = intent.getStringExtra(Const.NOTE.ID_NOTE)
-        if (id != null) {
-            Log.d("cek id receive", id)
-            viewModel.getNote(id)
-        }
+        id?.let { viewModel.getNote(it) }
     }
 
     private fun getCategories() {
-        var idid = dataNote?.categoriesId
-        if (idid != null) {
-            viewModel.getCategoriesById(idid)
-            Log.d("cek categories", idid)
+        val idCategories = dataNote?.categoriesId
+        //for Get Categories by id Name
+        idCategories?.let { viewModel.getCategoriesById(it) }
 
-        }
     }
 
     private fun favourite() {
         val idNote = dataNote?.id
         if (dataNote?.favorite == true) {
             viewModel.unFavouriteNote(idNote)
-//            setResult(6100)
+            setResult(6100)
         } else {
             viewModel.favouriteNote(idNote)
-//            setResult(6100)
+            setResult(6100)
         }
 
     }
@@ -140,36 +221,73 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
 
     private fun createUpdateNote() {
         val idNote = dataNote?.id
-//        val title = binding.etTitle.textOf()
-//        val content = binding.etContent.textOf()
+        val title = binding.etTitle.textOf()
+        val content = binding.etContent.textOf()
         val categories = idCategories
+        val photo = filePhoto
 
-//        if (dataNote == null) {
-//            if (title.isEmpty() || content.isEmpty()) {
-//                return
-//            } else {
-//                viewModel.createNote(title, content, categories)
-//            }
-//        } else {
-////            tos("$categories")
-//            viewModel.editNote(idNote,title,content,categories)
-//        }
-
-    }
-
-    private fun date() {
-        val originalDateString = dataNote?.updatedAt
-        if (originalDateString != null) {
-            val originalFormat = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
-            val date = originalFormat.parse(originalDateString)
-
-            val targetFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-            val formattedDate = targetFormat.format(date)
-
-//            binding.tvDate.text = formattedDate
-
+        if (title.isEmpty() || content.isEmpty()) {
+            //Return nothing if the title and the content is empty
+            return
+        } else {
+            if (dataNote == null) {
+                //If dataNote is null then it create new Note
+                    if (photo != null) {
+                        //Check if it contains photo or not
+                        viewModel.createNotePhoto(title, content, categories,photo)
+                    } else {
+                        viewModel.createNote(title, content, categories)
+                    }
+            }else{
+                //If dataNote is not empty then it update exist Note
+                if (photo != null) {
+                    //Check if it contains photo or not
+                    viewModel.editNotePhoto(idNote,title, content, categories,photo)
+                } else {
+                    viewModel.editNote(idNote,title, content, categories)
+                }
+            }
         }
+
+        if (dataNote == null) {
+                if (title.isEmpty() || content.isEmpty()) {
+                    return
+                } else {
+                    viewModel.createNote(title, content, categories)
+                }
+        } else {
+            viewModel.editNote(idNote,title,content,categories)
+        }
+
     }
+
+
+    private fun setDateTime() {
+        val calendar = Calendar.getInstance()
+        val currentDate = calendar.time
+
+        // Define the date and time format
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
+
+        // Format the current date and time to strings
+        val formattedDate = dateFormat.format(currentDate)
+        val formattedTime = timeFormat.format(currentDate)
+        val combinedText = "$formattedDate $formattedTime"
+
+
+        // Display the date and time in your UI or perform any desired action
+        binding.tvDate.text = combinedText
+
+//        if(binding.tvDate.text.isNullOrEmpty()){
+//            tos("data")
+//        }else {
+////            binding.tvDate.text = dateFormatted
+//            tos("data2")
+//
+//        }
+    }
+
 
     //TODO LOADING DIALOG
     private fun observe() {
@@ -180,18 +298,28 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
                         when (it.status) {
                             ApiStatus.LOADING -> loadingDialog.show()
                             ApiStatus.SUCCESS -> {
-//                                when (it.message) {
-//                                    "Favourite" -> tos("liked")
-//                                    "UnFavourite" -> tos("UnFavourite")
+                                when (it.message) {
+
+                                    "Favourite" -> {
+                                        //Update Note later after note favoured
+                                        dataNote?.id?.let { it1 -> viewModel.getNote(it1) }
+                                        binding.root.snacked("Note Favoured")
+                                    }
+                                    "UnFavourite" -> {
+                                        //Update Note later after note unfavoured
+                                        dataNote?.id?.let { it1 -> viewModel.getNote(it1) }
+                                    binding.root.snacked("Note UnFavoured")
+                                    }
+                                    "Note Deleted" -> {
+                                        finish()
+                                        setResult(6100)
+                                        tos("Note Deleted")
+                                    }
+                                }
+//                                if (it.message == "Favourite") {
 //                                }
-                                if (it.message == "Favourite") {
-                                    viewModel.getNote(dataNote?.id)
-                                    binding.root.snacked("Note Favourited")
-                                }
-                                if (it.message == "UnFavourite") {
-                                    viewModel.getNote(dataNote?.id)
-                                    binding.root.snacked("Note UnFavourited")
-                                }
+//                                if (it.message == "UnFavourite") {
+//                                }
                                 loadingDialog.dismiss()
                                 setResult(6100)
                             }
@@ -206,8 +334,6 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
                 launch {
                     viewModel.listCategory.collect { data ->
                         dataCategories.addAll(data)
-                        Log.d("cek categories", dataCategories.toString())
-                        Log.d("cek it", data.toString())
 
                     }
                 }
@@ -215,56 +341,99 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
                     viewModel.dataNote.collect { data ->
                         binding.data = data
                         dataNote = data
+                        dateFormatted = data?.updatedAtFormatted
                         getCategories()
-                        date()
+//                        date()
 
+                        if (data?.photo == null){
+                            //TODO TEST VISIBILITY KALO DI ADD IMAGE
+                            binding.imageView.visibility = View.GONE
+                        } else {
+                            binding.imageView.visibility = View.VISIBLE
+                        }
 
-//                        if (data?.photo == null){
-//                            binding.imageView.visibility = View.GONE
-//                        } else {
-//                            binding.imageView.visibility = View.VISIBLE
-//                        }
-
-
-                        Log.d("cek note", dataNote.toString())
 
                     }
                 }
                 launch {
                     viewModel.categoriesName.collect { data ->
-//                        binding.dropdownCategories.setText(data?.category)
+                        binding.dropdownCategories.setText(data?.category)
                     }
                 }
             }
         }
     }
 
-//    private fun autocompleteSpinner() {
-//
-//        val autoCompleteSpinner = findViewById<AutoCompleteTextView>(R.id.dropdownCategories)
-//        val adapter =
-//            ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, dataCategories)
-//        autoCompleteSpinner.setAdapter(adapter)
-////        binding.dropdownCategories.setTextColor(ContextCompat.getColor(this, R.color.black))
-//
-//
-//        // Show the dropdown list when the AutoCompleteTextView is clicked
-//        autoCompleteSpinner.setOnClickListener {
-//            autoCompleteSpinner.showDropDown()
-//            autoCompleteSpinner.dropDownVerticalOffset = -autoCompleteSpinner.height
-//
-//        }
-//
-//        autoCompleteSpinner.setOnItemClickListener { _, _, position, _ ->
-//            // Handle item selection here
-//            val selectedItem = dataCategories[position]
-//            idCategories = selectedItem?.id
-//
-//
-//        }
-//
-//    }
+    private fun openPictureDialog() {
+        MaterialAlertDialogBuilder(this).apply {
+            setItems(cameraOption) { _, which ->
+                // The 'which' argument contains the index position of the selected item
+                when (which) {
+                    0 -> activityLauncher.openCamera(this@NoteActivity, "${packageName}.fileprovider") { file, _ ->
+                        uploadAvatar(file)
+                    }
+                    1 -> activityLauncher.openGallery(this@NoteActivity) { file, _ ->
+                        uploadAvatar(file)
+                    }
+                }
+            }
+        }.create().show()
+    }
 
+    private fun uploadAvatar(file: File?) {
+        if (file == null) {
+            binding.root.snacked("error")
+            return
+        }
+
+        val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+        val resizeBitmap = BitmapHelper.resizeBitmap(bitmap, 512f)
+
+        file.delete()
+
+        //Result Photo
+        val uploadFile = createImageFile().also { it.writeBitmap(resizeBitmap) }
+//        Log.d("cek data photo", uploadFile.toString())
+
+        //Processing the photo result
+        filePhoto = uploadFile
+//        Log.d("cek file", filePhoto.toString())
+
+        Glide
+            .with(this@NoteActivity)
+            .load(uploadFile)
+                    .placeholder(R.drawable.ic_baseline_person_24)
+            .apply(RequestOptions.centerCropTransform())
+            .into(binding.imageView)
+
+
+    }
+
+    private fun autocompleteSpinner() {
+
+        val autoCompleteSpinner = findViewById<AutoCompleteTextView>(R.id.dropdownCategories)
+        val adapter =
+            ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, dataCategories)
+        autoCompleteSpinner.setAdapter(adapter)
+//        binding.dropdownCategories.setTextColor(ContextCompat.getColor(this, R.color.black))
+
+
+        // Show the dropdown list when the AutoCompleteTextView is clicked
+        autoCompleteSpinner.setOnClickListener {
+            autoCompleteSpinner.showDropDown()
+            autoCompleteSpinner.dropDownVerticalOffset = -autoCompleteSpinner.height
+
+        }
+
+        autoCompleteSpinner.setOnItemClickListener { _, _, position, _ ->
+            // Handle item selection here
+            val selectedItem = dataCategories[position]
+            idCategories = selectedItem?.id
+
+
+        }
+
+    }
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
@@ -273,6 +442,56 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
         resultIntent.putExtra("result_code", 6100)
         setResult(6100, resultIntent)
         finish()
+    }
+
+    // Function to initialize the text watcher
+    private fun setupTextWatcher(editText: EditText ,editText2: EditText) {
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Do nothing
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (isTextChangedByUser) {
+                    // Show a toast message with the updated text
+                    val updatedText = s.toString()
+                    binding.btnDelete.visibility = View.VISIBLE
+                    binding.btnCheck.visibility = View.VISIBLE
+                } else {
+                    isTextChangedByUser = true
+                    binding.btnDelete.visibility = View.GONE
+                    binding.btnCheck.visibility = View.GONE
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Do nothing
+            }
+        })
+
+        editText2.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Do nothing
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (isTextChangedByUser) {
+                    // Show a toast message with the updated text
+                    val updatedText = s.toString()
+                    binding.btnDelete.visibility = View.VISIBLE
+                    binding.btnCheck.visibility = View.VISIBLE
+                } else {
+                    isTextChangedByUser = true
+                    binding.btnDelete.visibility = View.GONE
+                    binding.btnCheck.visibility = View.GONE
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Do nothing
+            }
+        })
+
     }
 
 

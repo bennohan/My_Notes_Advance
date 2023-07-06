@@ -6,32 +6,48 @@ import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bennohan.mynotes.R
 import com.bennohan.mynotes.base.BaseActivity
+import com.bennohan.mynotes.database.Const
 import com.bennohan.mynotes.databinding.ActivityLoginBinding
 import com.bennohan.mynotes.ui.home.NavigationActivity
 import com.bennohan.mynotes.ui.register.RegisterActivity
 import com.crocodic.core.api.ApiStatus
+import com.crocodic.core.data.CoreSession
 import com.crocodic.core.extension.openActivity
 import com.crocodic.core.extension.textOf
 import com.crocodic.core.extension.tos
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(R.layout.activity_login) {
+
+    @Inject
+    lateinit var session: CoreSession
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         tvRegister()
+        observe()
 
         binding.btnLogin.setOnClickListener {
-
             login()
-            observe()
         }
+
+        binding.btnLoginBiometric.setOnClickListener {
+            showBiometricPrompt()
+        }
+
     }
 
     private fun login() {
@@ -53,6 +69,50 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(R.layou
         binding.tvOption.movementMethod = LinkMovementMethod.getInstance() // Required for clickable spans to work
 
     }
+
+    private fun showBiometricPrompt() {
+        val builder = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Biometric Authentication")
+            .setSubtitle("Enter biometric credential to proceed")
+            .setDescription("Input your Fingerprint or FaceID to ensure it's you!")
+            .setNegativeButtonText("Cancel")
+
+        val promptInfo = builder.build()
+
+        val biometricPrompt = initBiometricPrompt {
+            viewModel.login(session.getString(Const.LOGIN.EMAIL_PHONE), session.getString(Const.LOGIN.PASSWORD))
+        }
+
+        biometricPrompt.authenticate(promptInfo)
+    }
+    private fun initBiometricPrompt(listener: (Boolean) -> Unit): BiometricPrompt {
+        //Get executor running on main thread.
+        val executor = ContextCompat.getMainExecutor(this)
+
+        //Creating object
+        val callback = object : BiometricPrompt.AuthenticationCallback() {
+            //Override method to handle biometric result
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                super.onAuthenticationSucceeded(result)
+                listener(true)
+            }
+
+            override fun onAuthenticationFailed() {
+                super.onAuthenticationFailed()
+                listener(false)
+            }
+
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                super.onAuthenticationError(errorCode, errString)
+                listener(false)
+            }
+        }
+
+        return BiometricPrompt(this, executor, callback)
+
+    }
+
+
 
     private fun observe() {
         lifecycleScope.launch {

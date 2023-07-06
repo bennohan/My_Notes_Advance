@@ -39,11 +39,6 @@ class MainActivity : NoViewModelActivity<ActivityMainBinding>(R.layout.activity_
                             openActivity<LoginActivity>()
                             finish()
                         }
-//                        binding.btnRegister.setOnClickListener {
-//                            openActivity<RegisterActivity>()
-//                            finish()
-//                        }
-
                     }
                 }
             },5000)

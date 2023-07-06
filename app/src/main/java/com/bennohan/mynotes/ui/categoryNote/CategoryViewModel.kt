@@ -41,6 +41,29 @@ class CategoryViewModel  @Inject constructor(
                     val data = response.getJSONArray(ApiCode.DATA).toList<Categories>(gson)
                     Log.d("cek list category",data.toString())
                     _listCategory.emit(data)
+//                    _apiResponse.emit(ApiResponse().responseSuccess())
+                }
+
+                override suspend fun onError(response: ApiResponse) {
+                    //Ask why the response wont show if the super is gone
+                    super.onError(response)
+                    _apiResponse.emit(ApiResponse().responseError())
+                }
+            })
+    }
+
+    fun createCategory(
+        category: String,
+        ) = viewModelScope.launch {
+        _apiResponse.emit(ApiResponse().responseLoading())
+        ApiObserver(
+            { apiService.createCategories(category) },
+            false,
+            object : ApiObserver.ResponseListener {
+                override suspend fun onSuccess(response: JSONObject) {
+                    val data = response.getJSONObject(ApiCode.DATA).toObject<Categories>(gson)
+                    Log.d("cek list category",data.toString())
+//                    _listCategory.emit(data)
                     _apiResponse.emit(ApiResponse().responseSuccess())
                 }
 
@@ -51,5 +74,53 @@ class CategoryViewModel  @Inject constructor(
                 }
             })
     }
-    
+
+ fun editCategory(
+        categoryId: String?,
+        category: String?,
+        ) = viewModelScope.launch {
+        _apiResponse.emit(ApiResponse().responseLoading())
+        ApiObserver(
+            { apiService.editCategories(categoryId,category) },
+            false,
+            object : ApiObserver.ResponseListener {
+                override suspend fun onSuccess(response: JSONObject) {
+                    val data = response.getJSONObject(ApiCode.DATA).toObject<Categories>(gson)
+                    Log.d("cek list category",data.toString())
+//                    _listCategory.emit(data)
+                    _apiResponse.emit(ApiResponse().responseSuccess())
+                }
+
+                override suspend fun onError(response: ApiResponse) {
+                    //Ask why the response wont show if the super is gone
+                    super.onError(response)
+                    _apiResponse.emit(ApiResponse().responseError())
+                }
+            })
+    }
+
+
+    fun deleteCategory(
+        categoryId: String?,
+    ) = viewModelScope.launch {
+        _apiResponse.emit(ApiResponse().responseLoading())
+        ApiObserver(
+            { apiService.deleteCategory(categoryId) },
+            false,
+            object : ApiObserver.ResponseListener {
+                override suspend fun onSuccess(response: JSONObject) {
+                    val data = response.getJSONObject(ApiCode.DATA).toObject<Categories>(gson)
+                    Log.d("cek list category",data.toString())
+//                    _listCategory.emit(data)
+                    _apiResponse.emit(ApiResponse().responseSuccess())
+                }
+
+                override suspend fun onError(response: ApiResponse) {
+                    //Ask why the response wont show if the super is gone
+                    super.onError(response)
+                    _apiResponse.emit(ApiResponse().responseError())
+                }
+            })
+    }
+
 }

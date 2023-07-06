@@ -31,6 +31,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.crocodic.core.api.ApiStatus
 import com.crocodic.core.extension.*
 import com.crocodic.core.helper.BitmapHelper
+import com.crocodic.core.helper.ImagePreviewHelper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -42,7 +43,7 @@ import javax.inject.Inject
 class ProfileFragment : BaseFragment<FragmentProfileBinding>(R.layout.fragment_profile) {
 
     @Inject
-    lateinit var userDao : UserDao
+    lateinit var userDao: UserDao
     private val viewModel by activityViewModels<ProfileViewModel>()
     private var dataUser: User? = null
     private var filePhoto: File? = null
@@ -52,34 +53,34 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(R.layout.fragment_p
     private var isTextChangedByUser = false
 
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         observe()
         binding?.tvName?.let { setupTextWatcher(it) }
 
-        binding?.btnPhoto?.setOnClickListener {
+        binding?.btnOpenPhoto?.setOnClickListener {
             openPictureDialog()
         }
 
         binding?.btnEditProfile?.setOnClickListener {
             editProfile()
         }
-
-
+        binding?.ivUserPhoto?.setOnClickListener {
+            ImagePreviewHelper(requireContext()).show(binding!!.ivUserPhoto, binding?.user?.photo)
+        }
 
 
     }
 
-    private fun observe(){
+    private fun observe() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.apiResponse.collect {
                         when (it.status) {
                             //TODO Loading dialog at fragment
-//                            ApiStatus.LOADING -> loadingDialog.show("Register")
+                            ApiStatus.LOADING -> {}
                             ApiStatus.SUCCESS -> {
                                 //TODO Replace it with TOAST
                                 binding?.root?.snacked("Profile Edited")
@@ -94,7 +95,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(R.layout.fragment_p
                     }
                 }
                 launch {
-                    userDao.getUser().collectLatest{ user->
+                    userDao.getUser().collectLatest { user ->
                         binding?.user = user
                         dataUser = user
                         userName = user.name
@@ -109,17 +110,16 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(R.layout.fragment_p
 
     }
 
-    private fun editProfile(){
+    private fun editProfile() {
         val name = binding?.tvName?.textOf()
         val photo = filePhoto
 
-        binding?.btnEditProfile?.setOnClickListener {
-            if (photo != null) {
-                viewModel.editProfilePhoto(name,photo)
-            } else {
-                viewModel.editProfile(name)
-            }
+        if (photo != null) {
+            viewModel.editProfilePhoto(name, photo)
+        } else {
+            viewModel.editProfile(name)
         }
+
     }
 
 
@@ -128,10 +128,13 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(R.layout.fragment_p
             setItems(myArray) { _, which ->
                 // The 'which' argument contains the index position of the selected item
                 when (which) {
-                    0 -> (requireActivity() as NavigationActivity).activityLauncher.openCamera(requireActivity(), "${requireActivity().packageName}.fileprovider") { file, _ ->
+                    0 -> (requireActivity() as NavigationActivity).activityLauncher.openCamera(
+                        requireActivity(),
+                        "${requireActivity().packageName}.fileprovider") { file, _ ->
                         uploadAvatar(file)
                     }
-                    1 -> (requireActivity() as NavigationActivity).activityLauncher.openGallery(requireContext()) { file, _ ->
+                    1 -> (requireActivity() as NavigationActivity).activityLauncher.openGallery(
+                        requireContext()) { file, _ ->
                         uploadAvatar(file)
                     }
                 }
@@ -158,7 +161,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(R.layout.fragment_p
         binding?.btnEditProfile?.visibility = View.VISIBLE
         Log.d("cek isi photo", uploadFile.toString())
 
-        if (uploadFile != null){
+        if (uploadFile != null) {
             binding?.ivUserEditedView?.visibility = View.VISIBLE
             binding?.ivUserEditedView?.let {
                 Glide
@@ -171,8 +174,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(R.layout.fragment_p
         } else {
             binding?.ivUserEditedView?.visibility = View.GONE
         }
-
-
 
 
     }

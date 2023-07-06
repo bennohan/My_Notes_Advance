@@ -13,24 +13,12 @@ import retrofit2.http.Query
 
 interface ApiService {
 
+    //AUTH
     @FormUrlEncoded
     @POST("auth/login")
     suspend fun login(
         @Field("email_or_phone") emailOrPhone: String?,
         @Field("password") password: String?
-    ): String
-
-    @FormUrlEncoded
-    @POST("user/edit-profile")
-    suspend fun editProfile(
-        @Field("name") Name: String?,
-    ): String
-
-    @Multipart
-    @POST("user/edit-profile")
-    suspend fun editProfilePhoto(
-        @Query("name") Name: String?,
-        @Part photo : MultipartBody.Part?
     ): String
 
     @FormUrlEncoded
@@ -47,17 +35,29 @@ interface ApiService {
     suspend fun logout(
     ): String
 
-    @GET("note/index")
-    suspend fun getNote(): String
-
-    @GET("category/index")
-    suspend fun categoryList(): String
-
-    @GET("category/{categories_id}")
-    suspend fun categoryId(
-        @Path("categories_id") categoriesId: String?
+    //USER
+    @FormUrlEncoded
+    @POST("user/edit-profile")
+    suspend fun editProfile(
+        @Field("name") Name: String?,
     ): String
 
+    @Multipart
+    @POST("user/edit-profile")
+    suspend fun editProfilePhoto(
+        @Query("name") Name: String?,
+        @Part photo : MultipartBody.Part?
+    ): String
+
+
+    @FormUrlEncoded
+    @POST("user/edit-password")
+    suspend fun editPassword(
+        @Field("password_confirmation") passwordConfirmation: String?,
+    ): String
+
+
+    //NOTE
     @GET("note/{id}")
     suspend fun getNoteId(
         @Path("id") noteId : String?
@@ -84,7 +84,16 @@ interface ApiService {
         @Field("title") title: String?,
         @Field("content") content: String?,
         @Field("categories_id") categoriesId: String?,
-        ): String
+    ): String
+
+    @Multipart
+    @POST("note/create")
+    suspend fun createNotePhoto(
+        @Query("title") title: String?,
+        @Query("content") content: String?,
+        @Query("categories_id") categoriesId: String?,
+        @Part photo : MultipartBody.Part?
+    ): String
 
     @FormUrlEncoded
     @POST("note/edit/{id}")
@@ -93,7 +102,50 @@ interface ApiService {
         @Field("title") title: String?,
         @Field("content") content: String?,
         @Field("categories_id") categoriesId: String?,
-        ): String
+    ): String
+
+    @Multipart
+    @POST("note/edit/{id}")
+    suspend fun editNotePhoto(
+        @Path("id") noteId : String?,
+        @Query("title") title: String?,
+        @Query("content") content: String?,
+        @Query("categories_id") categoriesId: String?,
+        @Part photo : MultipartBody.Part?
+    ): String
+
+    @GET("note/index")
+    suspend fun getNote(): String
+
+
+    //CATEGORIES
+    @FormUrlEncoded
+    @POST("category/create")
+    suspend fun createCategories(
+        @Field("category") category: String?,
+    ): String
+
+ @FormUrlEncoded
+    @POST("category/edit/{id}")
+    suspend fun editCategories(
+     @Path("id") categoriesId : String?,
+     @Field("category") category: String?,
+    ): String
+
+    @DELETE("category/delete/{id}")
+    suspend fun deleteCategory(
+        @Path("id") categoriesId: String?
+    ): String
+
+    @GET("category/index")
+    suspend fun categoryList(): String
+
+    @GET("category/{categories_id}")
+    suspend fun categoryId(
+        @Path("categories_id") categoriesId: String?
+    ): String
+
+
 
 
 }

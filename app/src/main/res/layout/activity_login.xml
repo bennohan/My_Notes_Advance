@@ -138,7 +138,35 @@
             android:fontFamily="@font/inter_semibold_600"
             android:textSize="@dimen/_10sdp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnLogin" />
+            app:layout_constraintTop_toBottomOf="@id/btnLoginBiometric" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnLoginBiometric"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_text_background"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginEnd="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:fontFamily="@font/inter_extrabold_800"
+            android:text="Login with Biometric"
+            android:textAllCaps="false"
+            android:textColor="@color/profileColor"
+            app:layout_constraintTop_toBottomOf="@+id/tvOrLoginWith" />
+
+        <TextView
+            android:id="@+id/tvOrLoginWith"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold_600"
+            android:text="Or Login With"
+            android:textSize="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.512"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

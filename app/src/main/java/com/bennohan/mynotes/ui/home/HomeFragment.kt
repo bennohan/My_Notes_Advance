@@ -50,62 +50,78 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     @Inject
     lateinit var userDao: UserDao
-
+    private var categories: String? = null
     private var dataNote = ArrayList<Note?>()
 
 
-    //Adapter for Note List
-    private val adapterNote by lazy {
-        ReactiveListAdapter<ItemNoteBinding, Note>(R.layout.item_note).initItem { position, data ->
-            val intent = Intent(requireContext(), NoteActivity::class.java)
-            intent.putExtra(Const.NOTE.ID_NOTE, data.id)
-            (requireActivity() as NavigationActivity).activityLauncher.launch(intent) {
-                // IF Result
-                if (it.resultCode == 6100) {
-                    getNote()
-                    observe()
-                }
-            }
-        }
-
-
-    }
-
+//    //Adapter for Note List
 //    private val adapterNote by lazy {
-//        object : ReactiveListAdapter<ItemNoteBinding,Note>(R.layout.item_note) {
-//            override fun onBindViewHolder(
-//                holder: ItemViewHolder<ItemNoteBinding, Note>,
-//                position: Int
-//            ) {
-//                super.onBindViewHolder(holder, position)
-//                val item = getItem(position)
-//
-//                item?.let { itm ->
-//                    holder.binding.data = itm
-//                    holder.bind(itm)
-//
-////                    if (itm?.photo == null){
-////                        holder.binding.imageView.visibility = View.GONE
-////                    } else {
-////                        holder.binding.imageView.visibility = View.VISIBLE
-////                    }
-//
-//
-//                    holder.binding.cardView.setOnClickListener {
-//                        val intent = Intent(requireContext(), NoteActivity::class.java)
-//                        intent.putExtra(Const.NOTE.ID_NOTE, item.id)
-////                        startActivity(intent)
-//                        startActivityForResult(intent,-1)
-//
-//                    }
-//
-//
+//        ReactiveListAdapter<ItemNoteBinding, Note>(R.layout.item_note).initItem { position, data ->
+//            val intent = Intent(requireContext(), NoteActivity::class.java)
+//            intent.putExtra(Const.NOTE.ID_NOTE, data.id)
+//            (requireActivity() as NavigationActivity).activityLauncher.launch(intent) {
+//                // IF Result
+//                if (it.resultCode == 6100) {
+//                    getNote()
+//                    observe()
 //                }
-//
-//                }
-//
 //            }
 //        }
+//
+//
+//    }
+
+    private val adapterNote by lazy {
+        object : ReactiveListAdapter<ItemNoteBinding, Note>(R.layout.item_note) {
+            override fun onBindViewHolder(
+                holder: ItemViewHolder<ItemNoteBinding, Note>,
+                position: Int
+            ) {
+                super.onBindViewHolder(holder, position)
+                val item = getItem(position)
+
+                item?.let { itm ->
+                    holder.binding.data = itm
+                    holder.bind(itm)
+
+                    item.categoriesId?.let { viewModel.getCategoriesById(it) }
+                    android.util.Log.d("cek item", item.categoriesId.toString())
+
+                    holder.binding.tvCategory.setText(categories)
+
+                    holder.binding.cardView.setOnClickListener {
+                        val intent = Intent(requireContext(), NoteActivity::class.java)
+                        intent.putExtra(Const.NOTE.ID_NOTE, itm.id)
+                        (requireActivity() as NavigationActivity).activityLauncher.launch(intent) {
+                            // IF Result
+                            if (it.resultCode == 6100) {
+                                getNote()
+                                observe()
+                            }
+                        }
+                    }
+
+                    if (itm.photo.isEmpty()) {
+                        holder.binding.imageNote.visibility = View.GONE
+                    } else {
+                        holder.binding.imageNote.visibility = View.VISIBLE
+                    }
+
+                    holder.binding.cardView.setOnClickListener {
+                        val intent = Intent(requireContext(), NoteActivity::class.java)
+                        intent.putExtra(Const.NOTE.ID_NOTE, item.id)
+//                        startActivity(intent)
+                        startActivityForResult(intent, -1)
+
+                    }
+
+
+                }
+
+            }
+
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -133,8 +149,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         binding?.etSearch?.doOnTextChanged { text, _, _, _ ->
             if (text!!.isNotEmpty()) {
                 val filter = dataNote.filter {
-                    it?.title?.contains("$text",
-                        true) == true || it?.content?.contains("$text", true) == true
+                    it?.title?.contains(
+                        "$text",
+                        true
+                    ) == true || it?.content?.contains("$text", true) == true
                 }
                 adapterNote.submitList(filter)
 
@@ -150,12 +168,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
 
-
     private fun getNote() {
         viewModel.getNote()
     }
 
-    fun logout(){
+    fun logout() {
         viewModel.logout()
     }
 
@@ -186,6 +203,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                         dataNote.addAll(listNote)
 
 
+                    }
+                }
+                launch {
+                    viewModel.categoriesName.collect { data ->
+                        categories = data.toString()
+                        android.util.Log.d("cek categories", categories!!)
                     }
                 }
             }

@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -21,6 +22,7 @@ import com.bennohan.mynotes.database.User
 import com.bennohan.mynotes.database.UserDao
 import com.bennohan.mynotes.databinding.ActivityNavigationBinding
 import com.bennohan.mynotes.ui.addNote.NoteActivity
+import com.bennohan.mynotes.ui.categoryNote.CategoryActivity
 import com.bennohan.mynotes.ui.favouriteNote.FavouriteActivity
 import com.bennohan.mynotes.ui.login.LoginActivity
 import com.bennohan.mynotes.ui.profile.ProfileFragment
@@ -28,6 +30,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.crocodic.core.base.activity.NoViewModelActivity
 import com.crocodic.core.extension.openActivity
+import com.crocodic.core.helper.ImagePreviewHelper
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,6 +61,7 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
 
         drawerLayout = binding.drawerLayout
         navView = binding.navigationView
+        biometric()
 
 
         binding.btnAddNote.setOnClickListener {
@@ -133,6 +137,9 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
             navView.addHeaderView(headerView)
         }
 
+        ivProfile.setOnClickListener {
+            ImagePreviewHelper(this).show(ivProfile, user?.photo)
+        }
 
 
 //        val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(this, com.crocodic.core.R.color.text_red))
@@ -188,16 +195,21 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
         })
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_logout -> {
-                    drawerLayout.closeDrawer(GravityCompat.START)
-                    logout()
-                    true
-                }
                 R.id.nav_favourite -> {
                     // Handle Settings item selection
                     drawerLayout.closeDrawer(GravityCompat.START)
                     // Implement your logic for Settings item here
                     openActivity<FavouriteActivity>()
+                    true
+                }
+                R.id.nav_category -> {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                    openActivity<CategoryActivity>()
+                    true
+                }
+                R.id.nav_logout -> {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                    logout()
                     true
                 }
                 else -> false
@@ -263,5 +275,19 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
 
     }
 
+    private fun biometric(){
+        val biometricManager = BiometricManager.from(this)
+        when (biometricManager.canAuthenticate()) {
+            BiometricManager.BIOMETRIC_SUCCESS -> {
+                // Biometric authentication is available
+            }
+            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE,
+            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE,
+            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
+                // Biometric authentication is not available or no biometric credentials enrolled
+            }
+            // Handle other error cases if needed
+        }
+    }
 
 }

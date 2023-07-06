@@ -40,13 +40,13 @@ class LoginViewModel @Inject constructor(
                     val token = response.getJSONObject("data").getJSONObject("token")
                         .getString("access_token")
                     session.setValue(Const.TOKEN.ACCESS_TOKEN, token)
+                    session.setValue(Const.LOGIN.EMAIL_PHONE,emailOrPhone)
+                    session.setValue(Const.LOGIN.PASSWORD,password)
                     userDao.insert(data.copy(idRoom = 1))
                     _apiResponse.emit(ApiResponse().responseSuccess())
-
                 }
 
                 override suspend fun onError(response: ApiResponse) {
-                    //Ask why the response wont show if the super is gone
                     super.onError(response)
                     _apiResponse.emit(ApiResponse().responseError())
                 }

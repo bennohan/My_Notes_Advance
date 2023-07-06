@@ -37,7 +37,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/ivUser"
+                android:id="@+id/ivUserPhoto"
                 android:layout_width="@dimen/_90sdp"
                 android:layout_height="@dimen/_90sdp"
                 android:scaleType="fitXY"
@@ -64,13 +64,13 @@
                 app:cardCornerRadius="@dimen/_10sdp"
                 android:layout_marginStart="@dimen/_75sdp"
                 android:layout_marginTop="@dimen/_70sdp"
-                app:layout_constraintBottom_toBottomOf="@+id/ivUser"
-                app:layout_constraintEnd_toEndOf="@+id/ivUser"
-                app:layout_constraintStart_toStartOf="@+id/ivUser"
-                app:layout_constraintTop_toTopOf="@+id/ivUser">
+                app:layout_constraintBottom_toBottomOf="@+id/ivUserPhoto"
+                app:layout_constraintEnd_toEndOf="@+id/ivUserPhoto"
+                app:layout_constraintStart_toStartOf="@+id/ivUserPhoto"
+                app:layout_constraintTop_toTopOf="@+id/ivUserPhoto">
 
                 <ImageButton
-                    android:id="@+id/btnPhoto"
+                    android:id="@+id/btnOpenPhoto"
                     android:layout_width="@dimen/_30sdp"
                     android:layout_height="@dimen/_30sdp"
                     android:background="@color/profileColor"
@@ -88,7 +88,7 @@
                 android:layout_marginTop="@dimen/_20sdp"
                 android:layout_marginEnd="@dimen/_20sdp"
                 android:background="@drawable/edit_text_background"
-                app:layout_constraintTop_toBottomOf="@+id/ivUser">
+                app:layout_constraintTop_toBottomOf="@+id/ivUserPhoto">
 
 
                 <ImageView

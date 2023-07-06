@@ -82,12 +82,14 @@ class RegisterActivity :
 
     private fun validatePassword(){
         if (!isValidPasswordLength(binding.etPassword.textOf())){
+            //If Password length is not 6 character
             binding.tvPasswordLength.visibility = View.VISIBLE
             return
         }else{
             binding.tvPasswordLength.visibility = View.GONE
         }
         if (binding.etPassword.textOf() != binding.etConfirmPassword.textOf()){
+            //If Password  is not match
             binding.tvPasswordNotMatch.visibility = View.VISIBLE
             return
         }else{
@@ -118,7 +120,7 @@ class RegisterActivity :
             return regex.matches(phoneNumber)
         }
         if (!isValidIndonesianPhoneNumber(phone)) {
-            // Nomor Telephone valid
+            // if Telephone number is not valid
             binding.etPhone.error = "Nomor Telephone Tidak Valid"
             return
         }

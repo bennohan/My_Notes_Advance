@@ -43,7 +43,6 @@ class RegisterViewModel @Inject constructor(
                 }
 
                 override suspend fun onError(response: ApiResponse) {
-                    //Ask why the response wont show if the super is gone
                     super.onError(response)
                     _apiResponse.emit(ApiResponse().responseError())
                 }

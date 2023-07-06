@@ -6,6 +6,7 @@ import com.bennohan.mynotes.api.ApiService
 import com.bennohan.mynotes.base.BaseViewModel
 import com.bennohan.mynotes.database.Categories
 import com.bennohan.mynotes.database.Note
+import com.bennohan.mynotes.database.User
 import com.bennohan.mynotes.database.UserDao
 import com.crocodic.core.api.ApiCode
 import com.crocodic.core.api.ApiObserver
@@ -18,7 +19,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONObject
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -64,6 +69,35 @@ class NoteViewModel @Inject constructor(
                 }
             })
     }
+
+    fun createNotePhoto(
+        name: String?,
+        content : String?,
+        categoriesId : String?,
+        photo: File
+    ) = viewModelScope.launch {
+        val fileBody = photo.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+        val filePart = MultipartBody.Part.createFormData("photo", photo.name, fileBody)
+        _apiResponse.emit(ApiResponse().responseLoading())
+        ApiObserver(
+            { apiService.createNotePhoto(name,content,categoriesId,filePart) },
+            false,
+            object : ApiObserver.ResponseListener {
+                override suspend fun onSuccess(response: JSONObject) {
+                    val data = response.getJSONObject(ApiCode.DATA).toObject<Note>(gson)
+                    _dataNote.emit(data)
+                    _apiResponse.emit(ApiResponse().responseSuccess())
+
+                }
+
+                override suspend fun onError(response: ApiResponse) {
+                    //Ask why the response wont show if the super is gone
+                    super.onError(response)
+                    _apiResponse.emit(ApiResponse().responseError())
+                }
+            })
+    }
+
 
     fun getCategory(
     ) = viewModelScope.launch {
@@ -111,7 +145,7 @@ class NoteViewModel @Inject constructor(
     }
 
     fun getNote(
-        noteId : String?
+        noteId : String
     ) = viewModelScope.launch {
         _apiResponse.emit(ApiResponse().responseLoading())
         ApiObserver(
@@ -196,6 +230,37 @@ class NoteViewModel @Inject constructor(
                 }
             })
     }
+
+    fun editNotePhoto(
+        noteId : String?,
+        title: String?,
+        content : String?,
+        categoriesId : String?,
+        photo: File
+    ) = viewModelScope.launch {
+        val fileBody = photo.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+        val filePart = MultipartBody.Part.createFormData("photo", photo.name, fileBody)
+        _apiResponse.emit(ApiResponse().responseLoading())
+        ApiObserver(
+            { apiService.editNotePhoto(noteId,title,content,categoriesId,filePart) },
+            false,
+            object : ApiObserver.ResponseListener {
+                override suspend fun onSuccess(response: JSONObject) {
+                    val data = response.getJSONObject(ApiCode.DATA).toObject<Note>(gson)
+                    _dataNote.emit(data)
+                    _apiResponse.emit(ApiResponse().responseSuccess())
+
+                }
+
+                override suspend fun onError(response: ApiResponse) {
+                    //Ask why the response wont show if the super is gone
+                    super.onError(response)
+                    _apiResponse.emit(ApiResponse().responseError())
+                }
+            })
+    }
+
+
 
     fun deleteNote(
         noteId : String?
