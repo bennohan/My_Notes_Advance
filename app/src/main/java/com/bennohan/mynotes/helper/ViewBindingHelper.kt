@@ -17,13 +17,7 @@ class ViewBindingHelper {
             view.setImageDrawable(null)
 
             if (imageUrl.isNullOrEmpty()) {
-                Glide
-                    .with(view.context)
-                    .load(R.drawable.ic_baseline_arrow_back_24)
-//                    .placeholder(R.drawable.ic_baseline_person_24)
-                    .apply(RequestOptions.centerCropTransform())
-                    .into(view)
-
+                //Do nothing
 
             } else {
                 imageUrl.let {

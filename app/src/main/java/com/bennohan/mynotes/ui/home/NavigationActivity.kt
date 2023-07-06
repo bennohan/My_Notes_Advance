@@ -22,6 +22,7 @@ import com.bennohan.mynotes.database.User
 import com.bennohan.mynotes.database.UserDao
 import com.bennohan.mynotes.databinding.ActivityNavigationBinding
 import com.bennohan.mynotes.ui.addNote.NoteActivity
+import com.bennohan.mynotes.ui.biometric.SettingActivity
 import com.bennohan.mynotes.ui.categoryNote.CategoryActivity
 import com.bennohan.mynotes.ui.favouriteNote.FavouriteActivity
 import com.bennohan.mynotes.ui.login.LoginActivity
@@ -48,7 +49,7 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
 
     private  var user : User? = null
 
-    private  var icon : String? = null
+//    private  var icon : String? = null
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
@@ -61,19 +62,21 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
 
         drawerLayout = binding.drawerLayout
         navView = binding.navigationView
-        biometric()
+
+//        biometric()
 
 
         binding.btnAddNote.setOnClickListener {
             openActivity<NoteActivity>()
         }
 
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     userDao.getUser().collect{
                         Log.d("cek user Nav", it.toString())
-                        icon = it.photo
+//                        icon = it.photo
                         user = it
                         sideMenu()
                     }
@@ -83,15 +86,7 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
 
         replaceFragment(homeFragment)
 
-//        val iconString = icon// Retrieve the icon string from the menu item data
-//        if (iconString != null) {
-//            Log.d("cek icon",iconString)
-//        }
-//        val iconResourceId = resources.getResourceName(iconString, "drawable", packageName)
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottomNavigation)
-//        val profileIcon : MenuItem = bottomNavigationView.menu.findItem(R.id.navProfile)
-//        profileIcon.setIcon(iconResourceId)
-//        profileIcon.setIcon(get)
         bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.navHome -> {
@@ -133,6 +128,7 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
             navView.addHeaderView(headersView)
 
         } else {
+            //If Header is not null it remove old header
             navView.removeHeaderView(navView.getHeaderView(0))
             navView.addHeaderView(headerView)
         }
@@ -142,15 +138,10 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
         }
 
 
-//        val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(this, com.crocodic.core.R.color.text_red))
-//        val favourite = navView.findViewById<NavigationView>(R.id.nav_favourite)
-//        favourite.itemIconTintList = colorStateList
-
-        //TODO GET DATA USER
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    val user = userDao.getUser().collect{
+                    userDao.getUser().collect{
                         tvUsername.text = it.name
 
                         Glide.with(this@NavigationActivity)
@@ -207,6 +198,11 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
                     openActivity<CategoryActivity>()
                     true
                 }
+                R.id.nav_setting -> {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                    openActivity<SettingActivity>()
+                    true
+                }
                 R.id.nav_logout -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     logout()
@@ -216,7 +212,7 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
             }
         }
 
-//        binding?.btnMenu?.setOnClickListener {
+//        homeFragment.id.btnMenu?.setOnClickListener {
 //            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
 //                drawerLayout.closeDrawer(GravityCompat.START)
 //            } else {
@@ -275,19 +271,21 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
 
     }
 
-    private fun biometric(){
-        val biometricManager = BiometricManager.from(this)
-        when (biometricManager.canAuthenticate()) {
-            BiometricManager.BIOMETRIC_SUCCESS -> {
-                // Biometric authentication is available
-            }
-            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE,
-            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE,
-            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-                // Biometric authentication is not available or no biometric credentials enrolled
-            }
-            // Handle other error cases if needed
-        }
-    }
+
+
+//    private fun biometric(){
+//        val biometricManager = BiometricManager.from(this)
+//        when (biometricManager.canAuthenticate()) {
+//            BiometricManager.BIOMETRIC_SUCCESS -> {
+//                // Biometric authentication is available
+//            }
+//            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE,
+//            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE,
+//            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
+//                // Biometric authentication is not available or no biometric credentials enrolled
+//            }
+//            // Handle other error cases if needed
+//        }
+//    }
 
 }

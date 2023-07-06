@@ -10,5 +10,7 @@
     <color name="mainColor">#485AB9</color>
     <color name="transparent">#00FFFFFF</color>
     <color name="profileColor">#485AB9</color>
-
+    <color name="red_note">#ECCDCD</color>
+    <color name="purple_note">#E2CFE3</color>
+    <color name="greenNote">#D2F6F0</color>
 </resources>

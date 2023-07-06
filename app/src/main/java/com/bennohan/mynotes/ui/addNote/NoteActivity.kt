@@ -1,5 +1,7 @@
 package com.bennohan.mynotes.ui.addNote
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Rect
@@ -13,6 +15,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -23,6 +26,7 @@ import com.bennohan.mynotes.database.Const
 import com.bennohan.mynotes.database.Note
 import com.bennohan.mynotes.databinding.ActivityNoteBinding
 import com.bennohan.mynotes.helper.ViewBindingHelper.Companion.writeBitmap
+import com.bennohan.mynotes.ui.login.LoginActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.crocodic.core.api.ApiStatus
@@ -132,7 +136,6 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
                 binding.etContent.removeTextChangedListener(textWatcher)
                 binding.etContent.text = SpannableStringBuilder.valueOf(textHistory[currentPosition])
                 binding.etContent.addTextChangedListener(textWatcher)
-                Toast.makeText(this, "Undo", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -142,15 +145,38 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
                 binding.etContent.removeTextChangedListener(textWatcher)
                 binding.etContent.text = SpannableStringBuilder.valueOf(textHistory[currentPosition])
                 binding.etContent.addTextChangedListener(textWatcher)
-                Toast.makeText(this, "Redo", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
 
     private fun deleteNote() {
-        val idNote = dataNote?.id
-        viewModel.deleteNote(idNote)
+
+            val builder = AlertDialog.Builder(this@NoteActivity)
+            builder.setTitle("Delete Note")
+            builder.setMessage("Apakah anda yakin akan menghapus Note ini")
+                .setCancelable(false)
+                .setPositiveButton("Delete") { _, _ ->
+                    // Delete selected note from database
+                    val idNote = dataNote?.id
+                    viewModel.deleteNote(idNote)
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+            val dialog: AlertDialog = builder.create()
+
+            // Set the color of the positive button text
+            dialog.setOnShowListener {
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                    .setTextColor(ContextCompat.getColor(this, com.crocodic.core.R.color.text_red))
+                dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+                    .setTextColor(ContextCompat.getColor(this, R.color.black))
+            }
+
+            // Show the dialog
+            dialog.show()
+
     }
 
 
@@ -235,28 +261,22 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
                     if (photo != null) {
                         //Check if it contains photo or not
                         viewModel.createNotePhoto(title, content, categories,photo)
+                        return
                     } else {
                         viewModel.createNote(title, content, categories)
+                        return
                     }
             }else{
                 //If dataNote is not empty then it update exist Note
                 if (photo != null) {
                     //Check if it contains photo or not
                     viewModel.editNotePhoto(idNote,title, content, categories,photo)
-                } else {
-                    viewModel.editNote(idNote,title, content, categories)
-                }
-            }
-        }
-
-        if (dataNote == null) {
-                if (title.isEmpty() || content.isEmpty()) {
                     return
                 } else {
-                    viewModel.createNote(title, content, categories)
+                    viewModel.editNote(idNote,title, content, categories)
+                    return
                 }
-        } else {
-            viewModel.editNote(idNote,title,content,categories)
+            }
         }
 
     }

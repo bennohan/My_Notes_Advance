@@ -52,24 +52,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     lateinit var userDao: UserDao
     private var categories: String? = null
     private var dataNote = ArrayList<Note?>()
+    val colorList = listOf(R.color.red_note, R.color.greenNote, R.color.purple_note)
 
 
-//    //Adapter for Note List
-//    private val adapterNote by lazy {
-//        ReactiveListAdapter<ItemNoteBinding, Note>(R.layout.item_note).initItem { position, data ->
-//            val intent = Intent(requireContext(), NoteActivity::class.java)
-//            intent.putExtra(Const.NOTE.ID_NOTE, data.id)
-//            (requireActivity() as NavigationActivity).activityLauncher.launch(intent) {
-//                // IF Result
-//                if (it.resultCode == 6100) {
-//                    getNote()
-//                    observe()
-//                }
-//            }
-//        }
-//
-//
-//    }
 
     private val adapterNote by lazy {
         object : ReactiveListAdapter<ItemNoteBinding, Note>(R.layout.item_note) {
@@ -84,12 +69,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                     holder.binding.data = itm
                     holder.bind(itm)
 
+
                     item.categoriesId?.let { viewModel.getCategoriesById(it) }
                     android.util.Log.d("cek item", item.categoriesId.toString())
 
                     holder.binding.tvCategory.setText(categories)
 
-                    holder.binding.cardView.setOnClickListener {
+                    holder.binding.constraint.setOnClickListener {
                         val intent = Intent(requireContext(), NoteActivity::class.java)
                         intent.putExtra(Const.NOTE.ID_NOTE, itm.id)
                         (requireActivity() as NavigationActivity).activityLauncher.launch(intent) {
@@ -101,11 +87,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                         }
                     }
 
-                    if (itm.photo.isEmpty()) {
-                        holder.binding.imageNote.visibility = View.GONE
-                    } else {
-                        holder.binding.imageNote.visibility = View.VISIBLE
-                    }
+//                    for (color in colorList) {
+//                        holder.binding.cardView.setBackgroundColor(color)
+//                        // Do something with the view after setting the color
+//                    }
+
 
                     holder.binding.cardView.setOnClickListener {
                         val intent = Intent(requireContext(), NoteActivity::class.java)
@@ -142,6 +128,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             activity.sideMenu()
         }
 
+
+
     }
 
     //Search function for Notes
@@ -156,11 +144,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                 }
                 adapterNote.submitList(filter)
 
-//                if (filter.isEmpty()) {
-//                    binding.tvDataKosong.visibility = View.VISIBLE
-//                } else {
-//                    binding.tvDataKosong.visibility = View.GONE
-//                }
+                if (filter.isEmpty()) {
+                    binding!!.tvNoteNotFound.visibility = View.VISIBLE
+                } else {
+                    binding!!.tvNoteNotFound.visibility = View.GONE
+                }
             } else {
                 adapterNote.submitList(dataNote)
             }

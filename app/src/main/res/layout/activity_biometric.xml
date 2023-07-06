@@ -20,7 +20,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.biometric.BiometricActivity">
+        tools:context=".ui.biometric.SettingActivity">
 
         <ImageButton
             android:id="@+id/btnBack"

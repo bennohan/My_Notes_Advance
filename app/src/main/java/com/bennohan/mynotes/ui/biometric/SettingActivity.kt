@@ -1,6 +1,5 @@
 package com.bennohan.mynotes.ui.biometric
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.biometric.BiometricManager
 import com.bennohan.mynotes.R
@@ -12,7 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class BiometricActivity :
+class SettingActivity :
     NoViewModelActivity<ActivityBiometricBinding>(R.layout.activity_biometric) {
 
     @Inject
@@ -23,6 +22,10 @@ class BiometricActivity :
 
         binding.hasBiometric = hasBiometricCapability()
         binding.enableBiometric = session.getBoolean(Const.BIOMETRIC.BIOMETRIC)
+
+        binding.btnBack.setOnClickListener {
+            finish()
+        }
 
         binding.btnBiometric.setOnCheckedChangeListener { buttonView, isChecked ->
             session.setValue(Const.BIOMETRIC.BIOMETRIC, isChecked)

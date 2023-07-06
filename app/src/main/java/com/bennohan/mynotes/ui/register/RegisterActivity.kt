@@ -44,7 +44,7 @@ class RegisterActivity :
 
     //Text View Login
     private fun tvLogin() {
-        val spannableString = SpannableString("Don't Have an Account? Login Now")
+        val spannableString = SpannableString("Already Have an Account? Login Now")
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(view: View) {
                 openActivity<LoginActivity>()
@@ -52,7 +52,7 @@ class RegisterActivity :
         }
         spannableString.setSpan(
             clickableSpan,
-            23,
+            25,
             spannableString.length,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )

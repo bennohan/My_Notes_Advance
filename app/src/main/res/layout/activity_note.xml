@@ -42,6 +42,7 @@
                 android:layout_width="@dimen/_20sdp"
                 android:layout_height="@dimen/_15sdp"
                 android:layout_margin="@dimen/_10sdp"
+                android:visibility="gone"
                 android:backgroundTint="#00000000"
                 android:src="@drawable/ic_baseline_check_24"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -53,6 +54,7 @@
                 android:layout_width="@dimen/_20sdp"
                 android:layout_height="@dimen/_15sdp"
                 android:layout_margin="@dimen/_10sdp"
+                android:visibility="gone"
                 android:backgroundTint="#00000000"
                 android:src="@drawable/ic_baseline_delete_red"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -85,9 +87,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/inter_bold_700"
-                    android:hint="Judul Disini"
+                    android:hint="Titile"
                     android:text='@{data.title}'
                     android:textSize="@dimen/_15sdp"
+                    android:background="@null"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -128,7 +131,7 @@
                     android:layout_marginTop="@dimen/_15sdp"
                     android:background="@null"
                     android:fontFamily="@font/inter_bold_700"
-                    android:hint="Tulis Catatan Anda"
+                    android:hint="Content..."
                     android:text='@{data.content}'
                     android:textSize="@dimen/_15sdp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -140,7 +143,6 @@
                     imageUrl='@{data.photo}'
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     android:layout_marginTop="@dimen/_20sdp"
                     android:layout_marginBottom="@dimen/_30sdp"
                     app:layout_constraintBottom_toBottomOf="parent"

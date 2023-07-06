@@ -18,11 +18,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_10sdp"
-        android:background="#D2F6F0"
         android:foregroundGravity="center"
         app:cardCornerRadius="@dimen/_12sdp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#D2F6F0"
@@ -71,8 +71,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_50sdp"
                 android:layout_marginTop="@dimen/_15sdp"
-                android:maxHeight="@dimen/_70sdp"
-                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvNote"
                 tools:layout_editor_absoluteX="16dp" />
