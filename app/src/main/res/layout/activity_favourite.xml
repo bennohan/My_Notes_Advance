@@ -9,6 +9,7 @@
         tools:context=".ui.favouriteNote.FavouriteActivity">
 
         <ImageButton
+            android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_20sdp"

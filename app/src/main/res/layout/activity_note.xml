@@ -11,9 +11,10 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/_20sdp"
+        android:paddingTop="@dimen/_20sdp"
         android:orientation="vertical"
         tools:context=".ui.addNote.NoteActivity">
 
@@ -27,11 +28,12 @@
 
             <ImageButton
                 android:id="@+id/btnBack"
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_15sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_10sdp"
                 android:backgroundTint="#00000000"
                 android:scaleType="center"
+                android:foreground="?selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_baseline_arrow_back_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -39,11 +41,13 @@
 
             <ImageButton
                 android:id="@+id/btnCheck"
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_15sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_10sdp"
                 android:visibility="gone"
+                android:scaleType="center"
                 android:backgroundTint="#00000000"
+                android:foreground="?selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_baseline_check_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -51,15 +55,24 @@
 
             <ImageButton
                 android:id="@+id/btnDelete"
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_15sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_10sdp"
                 android:visibility="gone"
+                android:scaleType="center"
                 android:backgroundTint="#00000000"
+                android:foreground="?selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_baseline_delete_red"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/btnCheck"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_3sdp"
+                android:background="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -89,6 +102,7 @@
                     android:fontFamily="@font/inter_bold_700"
                     android:hint="Titile"
                     android:text='@{data.title}'
+                    android:maxWidth="@dimen/_150sdp"
                     android:textSize="@dimen/_15sdp"
                     android:background="@null"
                     app:layout_constraintStart_toStartOf="parent"
@@ -100,6 +114,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="Categories"
+                    android:text='@{data.categoriesName}'
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/etTitle" />
 
@@ -117,7 +132,6 @@
                     android:id="@+id/tvDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text='@{data.updatedAtFormatted}'
                     android:textColor="#171717"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.161"
@@ -159,6 +173,8 @@
             android:id="@+id/WYSIWYG"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="@dimen/_10sdp"
+            android:background="@drawable/note_white_line_background"
             android:gravity="center"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent">
@@ -167,6 +183,7 @@
                 android:id="@+id/btnShareNote"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:foreground="?selectableItemBackgroundBorderless"
                 android:layout_marginStart="@dimen/_10sdp"
                 android:layout_marginEnd="@dimen/_10sdp"
                 android:src="@drawable/ic_baseline_share_24" />
@@ -177,6 +194,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_10sdp"
                 android:layout_marginEnd="@dimen/_10sdp"
+                android:foreground="?selectableItemBackgroundBorderless"
                 tools:src="@drawable/ic_baseline_favorite_24"
                 android:src='@{data.favorite ? @drawable/ic_baseline_favorite_24 : @drawable/ic_baseline_favorite_border_24}' />
 
@@ -186,6 +204,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_10sdp"
                 android:layout_marginEnd="@dimen/_10sdp"
+                android:foreground="?selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_baseline_image_24" />
 
             <ImageButton
@@ -193,6 +212,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_10sdp"
+                android:foreground="?selectableItemBackgroundBorderless"
                 android:layout_marginEnd="@dimen/_10sdp"
                 android:src="@drawable/ic_baseline_undo_24" />
 
@@ -201,6 +221,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_10sdp"
+                android:foreground="?selectableItemBackgroundBorderless"
                 android:layout_marginEnd="@dimen/_10sdp"
                 android:src="@drawable/ic_baseline_redo_24" />
 

@@ -13,6 +13,9 @@ data class Note(
     @SerializedName("categories_id")
     val categoriesId: String?,
     @Expose
+    @SerializedName("categories_name")
+    val categoriesName: String?,
+    @Expose
     @SerializedName("content")
     val content: String,
     @Expose

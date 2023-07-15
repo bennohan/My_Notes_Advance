@@ -31,8 +31,6 @@ class HomeViewModel @Inject constructor(
     private var _listNote = MutableSharedFlow<List<Note?>>()
     var listNote = _listNote.asSharedFlow()
 
-    private var _categoriesName = MutableSharedFlow<Categories?>()
-    var categoriesName = _categoriesName.asSharedFlow()
 
     fun getNote(
     ) = viewModelScope.launch {
@@ -71,30 +69,6 @@ class HomeViewModel @Inject constructor(
                 }
             })
     }
-
-    fun getCategoriesById(
-        categoriesId : String
-    ) = viewModelScope.launch {
-        _apiResponse.emit(ApiResponse().responseLoading())
-        ApiObserver(
-            { apiService.categoryId(categoriesId) },
-            false,
-            object : ApiObserver.ResponseListener {
-                override suspend fun onSuccess(response: JSONObject) {
-                    val data = response.getJSONObject(ApiCode.DATA).toObject<Categories>(gson)
-                    Log.d("cek list category",data.toString())
-                    _categoriesName.emit(data)
-                    _apiResponse.emit(ApiResponse().responseSuccess())
-                }
-
-                override suspend fun onError(response: ApiResponse) {
-                    //Ask why the response wont show if the super is gone
-                    super.onError(response)
-                    _apiResponse.emit(ApiResponse().responseError())
-                }
-            })
-    }
-
 
 
 }

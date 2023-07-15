@@ -13,4 +13,7 @@
     <color name="red_note">#ECCDCD</color>
     <color name="purple_note">#E2CFE3</color>
     <color name="greenNote">#D2F6F0</color>
+    <color name="blue">#03A9F4</color>
+    <color name="yellow">#E6D00F</color>
+    <color name="pink">#B711DC</color>
 </resources>

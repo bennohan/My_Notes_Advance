@@ -48,6 +48,10 @@ class FavouriteActivity :
         observe()
         binding.rvNote.adapter = adapterNote
 
+        binding.btnBack.setOnClickListener {
+            finish()
+        }
+
     }
 
     private fun getNoteFavourite() {

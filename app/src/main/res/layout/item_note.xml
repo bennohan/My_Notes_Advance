@@ -25,7 +25,6 @@
             android:id="@+id/constraint"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#D2F6F0"
             android:padding="@dimen/_12sdp">
 
             <TextView
@@ -35,6 +34,9 @@
                 android:fontFamily="@font/inter_bold_700"
                 android:text='@{data.title}'
                 android:textSize="@dimen/_12sdp"
+                android:maxWidth="@dimen/_100sdp"
+                app:layout_constraintEnd_toStartOf="@+id/ivIconDate"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Judul Text" />
@@ -44,8 +46,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/inter_medium_500"
-                android:text="Sekolah"
+                android:text='@{data.categoriesName}'
                 android:textSize="@dimen/_10sdp"
+                tools:text="Categories"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvTitleNote" />
 
@@ -73,6 +76,7 @@
                 android:layout_marginTop="@dimen/_15sdp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvNote"
+                android:visibility="gone"
                 tools:layout_editor_absoluteX="16dp" />
 
             <ImageView

@@ -58,7 +58,7 @@ class NoteViewModel @Inject constructor(
                     val data = response.getJSONObject(ApiCode.DATA).toObject<Note>(gson)
                     Log.d("cek list",data.toString())
                     _dataNote.emit(data)
-                    _apiResponse.emit(ApiResponse().responseSuccess())
+                    _apiResponse.emit(ApiResponse().responseSuccess("Note Created"))
 
                 }
 
@@ -86,7 +86,7 @@ class NoteViewModel @Inject constructor(
                 override suspend fun onSuccess(response: JSONObject) {
                     val data = response.getJSONObject(ApiCode.DATA).toObject<Note>(gson)
                     _dataNote.emit(data)
-                    _apiResponse.emit(ApiResponse().responseSuccess())
+                    _apiResponse.emit(ApiResponse().responseSuccess("Note Created"))
 
                 }
 
@@ -219,7 +219,7 @@ class NoteViewModel @Inject constructor(
             false,
             object : ApiObserver.ResponseListener {
                 override suspend fun onSuccess(response: JSONObject) {
-                    _apiResponse.emit(ApiResponse().responseSuccess())
+                    _apiResponse.emit(ApiResponse().responseSuccess("Note Edited"))
 
                 }
 
@@ -248,7 +248,7 @@ class NoteViewModel @Inject constructor(
                 override suspend fun onSuccess(response: JSONObject) {
                     val data = response.getJSONObject(ApiCode.DATA).toObject<Note>(gson)
                     _dataNote.emit(data)
-                    _apiResponse.emit(ApiResponse().responseSuccess())
+                    _apiResponse.emit(ApiResponse().responseSuccess("Note Edited"))
 
                 }
 

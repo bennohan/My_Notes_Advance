@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
+//TODO LOGOUT LOGIN CONDITION
 class MainActivity : NoViewModelActivity<ActivityMainBinding>(R.layout.activity_main) {
 
     @Inject

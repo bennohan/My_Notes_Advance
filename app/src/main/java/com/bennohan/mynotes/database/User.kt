@@ -35,5 +35,5 @@ data class User(
     val photo: String?,
     @Expose
     @SerializedName("updated_at")
-    val updatedAt: String?
+    val updatedAt: String?,
 )

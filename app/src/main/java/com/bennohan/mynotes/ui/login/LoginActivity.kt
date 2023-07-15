@@ -8,6 +8,7 @@ import android.text.style.ClickableSpan
 import android.view.View
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -15,6 +16,7 @@ import com.bennohan.mynotes.R
 import com.bennohan.mynotes.base.BaseActivity
 import com.bennohan.mynotes.database.Const
 import com.bennohan.mynotes.databinding.ActivityLoginBinding
+import com.bennohan.mynotes.ui.editPassword.EditPasswordActivity
 import com.bennohan.mynotes.ui.home.NavigationActivity
 import com.bennohan.mynotes.ui.register.RegisterActivity
 import com.crocodic.core.api.ApiStatus
@@ -40,12 +42,20 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(R.layou
         tvRegister()
         observe()
 
+        binding.btnLoginBiometric.isVisible = session.getBoolean(Const.BIOMETRIC.BIOMETRIC)
+        binding.tvOrLoginWith.isVisible = session.getBoolean(Const.BIOMETRIC.BIOMETRIC)
+
+
         binding.btnLogin.setOnClickListener {
             login()
         }
 
         binding.btnLoginBiometric.setOnClickListener {
             showBiometricPrompt()
+        }
+
+        binding.tvForgetPassword.setOnClickListener {
+            openActivity<EditPasswordActivity>()
         }
 
     }

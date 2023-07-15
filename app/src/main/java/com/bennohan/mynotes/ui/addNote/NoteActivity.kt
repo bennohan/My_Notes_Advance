@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
@@ -13,7 +14,6 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -26,7 +26,6 @@ import com.bennohan.mynotes.database.Const
 import com.bennohan.mynotes.database.Note
 import com.bennohan.mynotes.databinding.ActivityNoteBinding
 import com.bennohan.mynotes.helper.ViewBindingHelper.Companion.writeBitmap
-import com.bennohan.mynotes.ui.login.LoginActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.crocodic.core.api.ApiStatus
@@ -41,7 +40,6 @@ import java.util.*
 
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
-//TODO BTN UNDO REDO
 class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.activity_note) {
 
     //Data
@@ -49,7 +47,6 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
     private var dataNote: Note? = null
     private var idCategories: String? = null
     private var filePhoto: File? = null
-    private var dateFormatted : String? = null
 
     //View for Keyboard
     private lateinit var rootView: View
@@ -73,9 +70,11 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
         observe()
         getNote()
 //        keyboardTop()
-        autocompleteSpinner()
         setDateTime()
+        autocompleteSpinner()
         undoRedo()
+
+
 
         setupTextWatcher(binding.etTitle,binding.etContent)
 
@@ -222,6 +221,8 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
 
     private fun getNote() {
         val id = intent.getStringExtra(Const.NOTE.ID_NOTE)
+        val colorNote = intent.getIntExtra("COLOR_EXTRA", R.color.white)
+        binding.constraint.setBackgroundResource(colorNote)
         id?.let { viewModel.getNote(it) }
     }
 
@@ -281,7 +282,7 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
 
     }
 
-
+    //Set the base Current Date
     private fun setDateTime() {
         val calendar = Calendar.getInstance()
         val currentDate = calendar.time
@@ -295,17 +296,9 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
         val formattedTime = timeFormat.format(currentDate)
         val combinedText = "$formattedDate $formattedTime"
 
-
         // Display the date and time in your UI or perform any desired action
-        binding.tvDate.text = combinedText
+            binding.tvDate.text = combinedText
 
-//        if(binding.tvDate.text.isNullOrEmpty()){
-//            tos("data")
-//        }else {
-////            binding.tvDate.text = dateFormatted
-//            tos("data2")
-//
-//        }
     }
 
 
@@ -319,7 +312,12 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
                             ApiStatus.LOADING -> loadingDialog.show()
                             ApiStatus.SUCCESS -> {
                                 when (it.message) {
-
+                                    "Note Created" -> {
+                                        tos("Note Created")
+                                    }
+                                    "Note Edited" -> {
+                                        tos("Note Edited")
+                                    }
                                     "Favourite" -> {
                                         //Update Note later after note favoured
                                         dataNote?.id?.let { it1 -> viewModel.getNote(it1) }
@@ -336,10 +334,6 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
                                         tos("Note Deleted")
                                     }
                                 }
-//                                if (it.message == "Favourite") {
-//                                }
-//                                if (it.message == "UnFavourite") {
-//                                }
                                 loadingDialog.dismiss()
                                 setResult(6100)
                             }
@@ -361,9 +355,9 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
                     viewModel.dataNote.collect { data ->
                         binding.data = data
                         dataNote = data
-                        dateFormatted = data?.updatedAtFormatted
-                        getCategories()
-//                        date()
+
+                        //Set Note Date Base on Latest Note was Updated
+                        binding.tvDate.text = data?.updatedAtFormatted
 
                         if (data?.photo == null){
                             //TODO TEST VISIBILITY KALO DI ADD IMAGE
@@ -413,11 +407,9 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
 
         //Result Photo
         val uploadFile = createImageFile().also { it.writeBitmap(resizeBitmap) }
-//        Log.d("cek data photo", uploadFile.toString())
 
         //Processing the photo result
         filePhoto = uploadFile
-//        Log.d("cek file", filePhoto.toString())
 
         Glide
             .with(this@NoteActivity)
@@ -466,6 +458,8 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
 
     // Function to initialize the text watcher
     private fun setupTextWatcher(editText: EditText ,editText2: EditText) {
+
+        //Edit text Title
         editText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 // Do nothing
@@ -473,7 +467,7 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (isTextChangedByUser) {
-                    // Show a toast message with the updated text
+                    // Show Button Check and Delete when user is typing something
                     val updatedText = s.toString()
                     binding.btnDelete.visibility = View.VISIBLE
                     binding.btnCheck.visibility = View.VISIBLE
@@ -489,6 +483,7 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
             }
         })
 
+        //Edit text Content
         editText2.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 // Do nothing
@@ -496,7 +491,7 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (isTextChangedByUser) {
-                    // Show a toast message with the updated text
+                    // Show Button Check and Delete when user is typing something
                     val updatedText = s.toString()
                     binding.btnDelete.visibility = View.VISIBLE
                     binding.btnCheck.visibility = View.VISIBLE

@@ -53,6 +53,7 @@ interface ApiService {
     @FormUrlEncoded
     @POST("user/edit-password")
     suspend fun editPassword(
+        @Field("new_password") newPassword: String?,
         @Field("password_confirmation") passwordConfirmation: String?,
     ): String
 

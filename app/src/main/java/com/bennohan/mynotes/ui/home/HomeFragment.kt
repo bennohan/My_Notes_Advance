@@ -1,18 +1,11 @@
 package com.bennohan.mynotes.ui.home
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
+import android.util.Log
 import android.view.View
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.core.view.GravityCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -25,34 +18,26 @@ import com.bennohan.mynotes.database.UserDao
 import com.bennohan.mynotes.databinding.FragmentHomeBinding
 import com.bennohan.mynotes.databinding.ItemNoteBinding
 import com.bennohan.mynotes.ui.addNote.NoteActivity
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.crocodic.core.api.ApiStatus
 import com.crocodic.core.base.adapter.ReactiveListAdapter
-import com.crocodic.core.extension.openActivity
-import com.crocodic.core.extension.snacked
-import com.crocodic.core.extension.tos
-import com.crocodic.core.helper.ImagePreviewHelper
-import com.crocodic.core.helper.log.Log
-import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import okhttp3.internal.format
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 //TODO GAMBAR DI ITEM NOTE
-//TODO PINDAH GAMBAR
 class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     private val viewModel by activityViewModels<HomeViewModel>()
 
     @Inject
     lateinit var userDao: UserDao
-    private var categories: String? = null
     private var dataNote = ArrayList<Note?>()
-    val colorList = listOf(R.color.red_note, R.color.greenNote, R.color.purple_note)
 
 
 
@@ -65,33 +50,35 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                 super.onBindViewHolder(holder, position)
                 val item = getItem(position)
 
+                val colorList = listOf(R.color.red_note, R.color.greenNote,  R.color.purple_note)
+
+
                 item?.let { itm ->
                     holder.binding.data = itm
                     holder.bind(itm)
 
+                    val colorIndex = position % colorList.size
+                    val color = colorList[colorIndex]
 
-                    item.categoriesId?.let { viewModel.getCategoriesById(it) }
-                    android.util.Log.d("cek item", item.categoriesId.toString())
+                    holder.binding.constraint.setBackgroundResource(color)
+                    Log.d("cek color", color.toString())
 
-                    holder.binding.tvCategory.setText(categories)
 
                     holder.binding.constraint.setOnClickListener {
                         val intent = Intent(requireContext(), NoteActivity::class.java)
                         intent.putExtra(Const.NOTE.ID_NOTE, itm.id)
+
+                        //Send Intent Background Color
+                        intent.putExtra("COLOR_EXTRA",color)
                         (requireActivity() as NavigationActivity).activityLauncher.launch(intent) {
                             // IF Result
                             if (it.resultCode == 6100) {
+                                android.util.Log.d("result Code","success")
                                 getNote()
                                 observe()
                             }
                         }
                     }
-
-//                    for (color in colorList) {
-//                        holder.binding.cardView.setBackgroundColor(color)
-//                        // Do something with the view after setting the color
-//                    }
-
 
                     holder.binding.cardView.setOnClickListener {
                         val intent = Intent(requireContext(), NoteActivity::class.java)
@@ -110,9 +97,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -191,12 +175,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                         dataNote.addAll(listNote)
 
 
-                    }
-                }
-                launch {
-                    viewModel.categoriesName.collect { data ->
-                        categories = data.toString()
-                        android.util.Log.d("cek categories", categories!!)
                     }
                 }
             }
