@@ -3,13 +3,12 @@ package com.bennohan.mynotes.ui.login
 import androidx.lifecycle.viewModelScope
 import com.bennohan.mynotes.api.ApiService
 import com.bennohan.mynotes.base.BaseViewModel
-import com.bennohan.mynotes.database.Const
-import com.bennohan.mynotes.database.User
-import com.bennohan.mynotes.database.UserDao
+import com.bennohan.mynotes.database.constant.Const
+import com.bennohan.mynotes.database.user.User
+import com.bennohan.mynotes.database.user.UserDao
 import com.crocodic.core.api.ApiCode
 import com.crocodic.core.api.ApiObserver
 import com.crocodic.core.api.ApiResponse
-import com.crocodic.core.api.ApiStatus
 import com.crocodic.core.data.CoreSession
 import com.crocodic.core.extension.toObject
 import com.google.gson.Gson
@@ -40,8 +39,8 @@ class LoginViewModel @Inject constructor(
                     val token = response.getJSONObject("data").getJSONObject("token")
                         .getString("access_token")
                     session.setValue(Const.TOKEN.ACCESS_TOKEN, token)
-                    session.setValue(Const.LOGIN.EMAIL_PHONE,emailOrPhone)
-                    session.setValue(Const.LOGIN.PASSWORD,password)
+                    session.setValue(Const.LOGIN.EMAIL_PHONE, emailOrPhone)
+                    session.setValue(Const.LOGIN.PASSWORD, password)
                     userDao.insert(data.copy(idRoom = 1))
                     _apiResponse.emit(ApiResponse().responseSuccess())
                 }

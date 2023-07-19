@@ -6,7 +6,7 @@
     <data>
         <variable
             name="user"
-            type="com.bennohan.mynotes.database.User" />
+            type="com.bennohan.mynotes.database.user.User" />
         <variable
             name="photo"
             type="java.io.File" />

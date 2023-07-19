@@ -1,6 +1,5 @@
 package com.bennohan.mynotes.ui.editPassword
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.core.widget.doAfterTextChanged
@@ -10,10 +9,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.bennohan.mynotes.R
 import com.bennohan.mynotes.base.BaseActivity
 import com.bennohan.mynotes.databinding.ActivityEditPasswordBinding
-import com.bennohan.mynotes.ui.home.NavigationActivity
 import com.crocodic.core.api.ApiStatus
 import com.crocodic.core.extension.isEmptyRequired
-import com.crocodic.core.extension.openActivity
 import com.crocodic.core.extension.textOf
 import com.crocodic.core.extension.tos
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,7 +21,6 @@ class EditPasswordActivity :
     BaseActivity<ActivityEditPasswordBinding, EditPasswordViewModel>(R.layout.activity_edit_password) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_edit_password)
 
         observe()
         validatePassword()
@@ -48,7 +44,7 @@ class EditPasswordActivity :
             validatePasswordForm()
             if (binding.etNewPassword.textOf().isEmpty()) {
                 binding.etNewPassword.error = "Password Tidak Boleh Kosong"
-//                binding.tvPasswordNotMatch.visibility = View.GONE
+                binding.tvPasswordNotMatch.visibility = View.GONE
             }
         }
 
@@ -64,16 +60,16 @@ class EditPasswordActivity :
 
         if (!isValidPasswordLength(newPassword)) {
             //If Password length is not 6 character
-//            binding.tvPasswordLength.visibility = View.VISIBLE
+            binding.tvPasswordLength.visibility = View.VISIBLE
             return
         } else {
-            //            binding.tvPasswordLength.visibility = View.GONE
+            binding.tvPasswordLength.visibility = View.GONE
         }
         if (confirmPassword != newPassword) {
-//            binding.tvPasswordNotMatch.visibility = View.VISIBLE
+            binding.tvPasswordNotMatch.visibility = View.VISIBLE
             return
         } else {
-//            binding.tvPasswordNotMatch.visibility = View.GONE
+            binding.tvPasswordNotMatch.visibility = View.GONE
         }
     }
 

@@ -1,30 +1,22 @@
 package com.bennohan.mynotes.ui.profile
 
-import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
-import androidx.core.widget.doAfterTextChanged
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bennohan.mynotes.R
 import com.bennohan.mynotes.base.BaseFragment
-import com.bennohan.mynotes.database.Const
-import com.bennohan.mynotes.database.Note
-import com.bennohan.mynotes.database.User
-import com.bennohan.mynotes.database.UserDao
+import com.bennohan.mynotes.database.user.User
+import com.bennohan.mynotes.database.user.UserDao
 import com.bennohan.mynotes.databinding.FragmentProfileBinding
 import com.bennohan.mynotes.helper.ViewBindingHelper.Companion.writeBitmap
-import com.bennohan.mynotes.ui.addNote.NoteActivity
-import com.bennohan.mynotes.ui.home.HomeViewModel
 import com.bennohan.mynotes.ui.home.NavigationActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -66,6 +58,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>(R.layout.fragment_p
         binding?.btnEditProfile?.setOnClickListener {
             editProfile()
         }
+
         binding?.ivUserPhoto?.setOnClickListener {
             ImagePreviewHelper(requireContext()).show(binding!!.ivUserPhoto, binding?.user?.photo)
         }

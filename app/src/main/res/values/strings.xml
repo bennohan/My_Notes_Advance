@@ -8,6 +8,45 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="login_text">This app helps you quickly record all your ideas and stories. With the Notebook app, you can create all your notes, checklists and store your beliefs, passwords or important information.</string>
+    <string name="splash_logo">Splash Logo</string>
+    <string name="hello">Hello!</string>
+    <string name="get_started">Get Started</string>
+    <string name="email_or_phone_number">Email or phone number</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="forgot_password">Forgot password ?</string>
+    <string name="login_with_biometric">Login with Biometric</string>
+    <string name="login">Login</string>
+    <string name="don_t_have_an_account_sign_up">Don’t have an account? Sign Up ?</string>
+    <string name="password">Password</string>
+    <string name="hi">Hi !</string>
+    <string name="create_new_account">Create New Account</string>
+    <string name="name">Name</string>
+    <string name="enter_your_name">Enter Your Name</string>
+    <string name="phone_number">Phone number</string>
+    <string name="enter_your_phone_number">Enter Your Phone Number</string>
+    <string name="email">Email</string>
+    <string name="enter_your_email">Enter Your Email</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="enter_your_confirm_password">Enter your confirm password</string>
+    <string name="password_did_nt_match">password did\'nt match</string>
+    <string name="password_must_be_6_characters_long">password must be 6 characters long</string>
+    <string name="register">Register</string>
+    <string name="enter_your_current_password_and_new_password_to_create_new_password">Enter your current password and new password to create new password</string>
+    <string name="logout_message">Anda yakin ingin keluar dari aplikasi ini? Jika keluar semua data anda akan dihapus dari perangkat ini.</string>
+    <string name="delete_categories_message">Apakah Anda yakin ingin menghapus categori ini?</string>
+    <string name="delete_note_message">Apakah anda yakin akan menghapus Note ini</string>
+    <string name="dialog_categories_message">Masukan nama categories baru anda</string>
+    <string name="new_password">New Password</string>
+    <string name="continue_button">Continue</string>
+    <string name="logout">Logout</string>
+    <string name="profile_image">profile image</string>
+    <string name="button_check">Button Check</string>
+    <string name="categories">Categories</string>
+    <string name="note_image">Note Image</string>
+    <string name="calendar_icon">Calendar Icon</string>
+    <string name="favourite_note_icon">Favourite Note Icon</string>
+    <string name="forward_button">Forward Button</string>
+    <string name="delete_icon">Delete Icon</string>
     <string-array name="label_image_source">
         <item>Take from camera</item>
         <item>Insert from gallery</item>

@@ -3,13 +3,14 @@ package com.bennohan.mynotes.ui.biometric
 import android.os.Bundle
 import androidx.biometric.BiometricManager
 import com.bennohan.mynotes.R
-import com.bennohan.mynotes.database.Const
+import com.bennohan.mynotes.database.constant.Const
 import com.bennohan.mynotes.databinding.ActivityBiometricBinding
 import com.crocodic.core.base.activity.NoViewModelActivity
 import com.crocodic.core.data.CoreSession
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class SettingActivity :
     NoViewModelActivity<ActivityBiometricBinding>(R.layout.activity_biometric) {
@@ -27,9 +28,8 @@ class SettingActivity :
             finish()
         }
 
-        binding.btnBiometric.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.btnBiometric.setOnCheckedChangeListener { _, isChecked ->
             session.setValue(Const.BIOMETRIC.BIOMETRIC, isChecked)
-
         }
 
     }

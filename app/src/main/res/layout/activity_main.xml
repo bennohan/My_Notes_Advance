@@ -11,6 +11,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/logo_mynotes"
+            android:contentDescription="@string/splash_logo"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -28,6 +29,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/picture_login"
+                android:contentDescription="@string/splash_logo"
                 android:layout_marginTop="@dimen/_30sdp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -38,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/inter_bold_700"
-                android:text="Hello!"
+                android:text="@string/hello"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_25sdp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -68,24 +70,10 @@
                 android:layout_marginEnd="@dimen/_20sdp"
                 android:layout_marginTop="@dimen/_20sdp"
                 android:fontFamily="@font/inter_extrabold_800"
-                android:text="Get Started"
+                android:text="@string/get_started"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 app:layout_constraintTop_toBottomOf="@+id/textView5" />
-
-<!--            <androidx.appcompat.widget.AppCompatButton-->
-<!--                android:id="@+id/btnRegister"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:background="@drawable/edit_text_background"-->
-<!--                android:layout_marginStart="@dimen/_20sdp"-->
-<!--                android:layout_marginEnd="@dimen/_20sdp"-->
-<!--                android:layout_marginTop="@dimen/_20sdp"-->
-<!--                android:fontFamily="@font/inter_extrabold_800"-->
-<!--                android:text="Register"-->
-<!--                android:textAllCaps="false"-->
-<!--                android:textColor="@color/profileColor"-->
-<!--                app:layout_constraintTop_toBottomOf="@+id/btnLogin" />-->
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

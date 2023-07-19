@@ -4,8 +4,6 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableStringBuilder
@@ -14,16 +12,15 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bennohan.mynotes.R
 import com.bennohan.mynotes.base.BaseActivity
-import com.bennohan.mynotes.database.Categories
-import com.bennohan.mynotes.database.Const
-import com.bennohan.mynotes.database.Note
+import com.bennohan.mynotes.database.categories.Categories
+import com.bennohan.mynotes.database.constant.Const
+import com.bennohan.mynotes.database.note.Note
 import com.bennohan.mynotes.databinding.ActivityNoteBinding
 import com.bennohan.mynotes.helper.ViewBindingHelper.Companion.writeBitmap
 import com.bumptech.glide.Glide
@@ -76,7 +73,7 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
 
 
 
-        setupTextWatcher(binding.etTitle,binding.etContent)
+        setupTextWatcher(binding.etTitle, binding.etContent)
 
         binding.btnShareNote.setOnClickListener {
             shareText(dataNote?.title, dataNote?.content)
@@ -88,7 +85,6 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
 
         binding.btnPhoto.setOnClickListener {
             openPictureDialog()
-
         }
 
         binding.btnBack.setOnClickListener {
@@ -133,7 +129,8 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
             if (currentPosition > 0) {
                 currentPosition--
                 binding.etContent.removeTextChangedListener(textWatcher)
-                binding.etContent.text = SpannableStringBuilder.valueOf(textHistory[currentPosition])
+                binding.etContent.text =
+                    SpannableStringBuilder.valueOf(textHistory[currentPosition])
                 binding.etContent.addTextChangedListener(textWatcher)
             }
         }
@@ -142,7 +139,8 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
             if (currentPosition < textHistory.size - 1) {
                 currentPosition++
                 binding.etContent.removeTextChangedListener(textWatcher)
-                binding.etContent.text = SpannableStringBuilder.valueOf(textHistory[currentPosition])
+                binding.etContent.text =
+                    SpannableStringBuilder.valueOf(textHistory[currentPosition])
                 binding.etContent.addTextChangedListener(textWatcher)
             }
         }
@@ -151,62 +149,32 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
 
     private fun deleteNote() {
 
-            val builder = AlertDialog.Builder(this@NoteActivity)
-            builder.setTitle("Delete Note")
-            builder.setMessage("Apakah anda yakin akan menghapus Note ini")
-                .setCancelable(false)
-                .setPositiveButton("Delete") { _, _ ->
-                    // Delete selected note from database
-                    val idNote = dataNote?.id
-                    viewModel.deleteNote(idNote)
-                }
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.dismiss()
-                }
-            val dialog: AlertDialog = builder.create()
-
-            // Set the color of the positive button text
-            dialog.setOnShowListener {
-                dialog.getButton(DialogInterface.BUTTON_POSITIVE)
-                    .setTextColor(ContextCompat.getColor(this, com.crocodic.core.R.color.text_red))
-                dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-                    .setTextColor(ContextCompat.getColor(this, R.color.black))
+        val builder = AlertDialog.Builder(this@NoteActivity)
+        builder.setTitle("Delete Note")
+        builder.setMessage(R.string.delete_note_message)
+            .setCancelable(false)
+            .setPositiveButton("Delete") { _, _ ->
+                // Delete selected note from database
+                val idNote = dataNote?.id
+                viewModel.deleteNote(idNote)
             }
-
-            // Show the dialog
-            dialog.show()
-
-    }
-
-
-    private fun keyboardTop() {
-        val viewTreeObserver = rootView.viewTreeObserver
-        viewTreeObserver.addOnGlobalLayoutListener {
-            val rect = Rect()
-            rootView.getWindowVisibleDisplayFrame(rect)
-
-            // Calculate the height difference between the root view and the visible display frame
-            val heightDiff = rootView.height - rect.height()
-
-            // Check if the height difference is above a certain threshold to determine if the keyboard is visible
-            val keyboardVisible = heightDiff > (rootView.height * 0.15)
-
-            if (keyboardVisible) {
-                // Keyboard is visible, adjust the position of the id/WYSIWYG view here
-                val layoutParams = binding.WYSIWYG.layoutParams as ConstraintLayout.LayoutParams
-                layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-                binding.WYSIWYG.layoutParams = layoutParams
-            } else {
-                // Keyboard is not visible, reset the position of the id/WYSIWYG view here
-                val layoutParams = binding.WYSIWYG.layoutParams as ConstraintLayout.LayoutParams
-                layoutParams.topToBottom =
-                    R.id.etContent // Set the correct anchor for the top constraint
-                binding.WYSIWYG.layoutParams = layoutParams
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
             }
+        val dialog: AlertDialog = builder.create()
+
+        // Set the color of the positive button text
+        dialog.setOnShowListener {
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                .setTextColor(ContextCompat.getColor(this, com.crocodic.core.R.color.text_red))
+            dialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+                .setTextColor(ContextCompat.getColor(this, R.color.black))
         }
 
-    }
+        // Show the dialog
+        dialog.show()
 
+    }
 
 
     private fun shareText(text1: String?, text2: String?) {
@@ -224,13 +192,6 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
         val colorNote = intent.getIntExtra("COLOR_EXTRA", R.color.white)
         binding.constraint.setBackgroundResource(colorNote)
         id?.let { viewModel.getNote(it) }
-    }
-
-    private fun getCategories() {
-        val idCategories = dataNote?.categoriesId
-        //for Get Categories by id Name
-        idCategories?.let { viewModel.getCategoriesById(it) }
-
     }
 
     private fun favourite() {
@@ -259,23 +220,19 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
         } else {
             if (dataNote == null) {
                 //If dataNote is null then it create new Note
-                    if (photo != null) {
-                        //Check if it contains photo or not
-                        viewModel.createNotePhoto(title, content, categories,photo)
-                        return
-                    } else {
-                        viewModel.createNote(title, content, categories)
-                        return
-                    }
-            }else{
+                if (photo != null) {
+                    //Check if it contains photo or not
+                    viewModel.createNotePhoto(title, content, categories, photo)
+                } else {
+                    viewModel.createNote(title, content, categories)
+                }
+            } else {
                 //If dataNote is not empty then it update exist Note
                 if (photo != null) {
                     //Check if it contains photo or not
-                    viewModel.editNotePhoto(idNote,title, content, categories,photo)
-                    return
+                    viewModel.editNotePhoto(idNote, title, content, categories, photo)
                 } else {
-                    viewModel.editNote(idNote,title, content, categories)
-                    return
+                    viewModel.editNote(idNote, title, content, categories)
                 }
             }
         }
@@ -297,7 +254,7 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
         val combinedText = "$formattedDate $formattedTime"
 
         // Display the date and time in your UI or perform any desired action
-            binding.tvDate.text = combinedText
+        binding.tvDate.text = combinedText
 
     }
 
@@ -326,7 +283,7 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
                                     "UnFavourite" -> {
                                         //Update Note later after note unfavoured
                                         dataNote?.id?.let { it1 -> viewModel.getNote(it1) }
-                                    binding.root.snacked("Note UnFavoured")
+                                        binding.root.snacked("Note UnFavoured")
                                     }
                                     "Note Deleted" -> {
                                         finish()
@@ -359,7 +316,7 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
                         //Set Note Date Base on Latest Note was Updated
                         binding.tvDate.text = data?.updatedAtFormatted
 
-                        if (data?.photo == null){
+                        if (data?.photo == null) {
                             //TODO TEST VISIBILITY KALO DI ADD IMAGE
                             binding.imageView.visibility = View.GONE
                         } else {
@@ -369,11 +326,7 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
 
                     }
                 }
-                launch {
-                    viewModel.categoriesName.collect { data ->
-                        binding.dropdownCategories.setText(data?.category)
-                    }
-                }
+
             }
         }
     }
@@ -383,7 +336,10 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
             setItems(cameraOption) { _, which ->
                 // The 'which' argument contains the index position of the selected item
                 when (which) {
-                    0 -> activityLauncher.openCamera(this@NoteActivity, "${packageName}.fileprovider") { file, _ ->
+                    0 -> activityLauncher.openCamera(
+                        this@NoteActivity,
+                        "${packageName}.fileprovider"
+                    ) { file, _ ->
                         uploadAvatar(file)
                     }
                     1 -> activityLauncher.openGallery(this@NoteActivity) { file, _ ->
@@ -414,7 +370,7 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
         Glide
             .with(this@NoteActivity)
             .load(uploadFile)
-                    .placeholder(R.drawable.ic_baseline_person_24)
+            .placeholder(R.drawable.ic_baseline_person_24)
             .apply(RequestOptions.centerCropTransform())
             .into(binding.imageView)
 
@@ -441,8 +397,6 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
             // Handle item selection here
             val selectedItem = dataCategories[position]
             idCategories = selectedItem?.id
-
-
         }
 
     }
@@ -457,7 +411,7 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
     }
 
     // Function to initialize the text watcher
-    private fun setupTextWatcher(editText: EditText ,editText2: EditText) {
+    private fun setupTextWatcher(editText: EditText, editText2: EditText) {
 
         //Edit text Title
         editText.addTextChangedListener(object : TextWatcher {
@@ -468,7 +422,6 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (isTextChangedByUser) {
                     // Show Button Check and Delete when user is typing something
-                    val updatedText = s.toString()
                     binding.btnDelete.visibility = View.VISIBLE
                     binding.btnCheck.visibility = View.VISIBLE
                 } else {
@@ -492,7 +445,6 @@ class NoteActivity : BaseActivity<ActivityNoteBinding, NoteViewModel>(R.layout.a
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (isTextChangedByUser) {
                     // Show Button Check and Delete when user is typing something
-                    val updatedText = s.toString()
                     binding.btnDelete.visibility = View.VISIBLE
                     binding.btnCheck.visibility = View.VISIBLE
                 } else {

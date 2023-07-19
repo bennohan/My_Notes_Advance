@@ -7,7 +7,7 @@
 
         <variable
             name="data"
-            type="com.bennohan.mynotes.database.Note" />
+            type="com.bennohan.mynotes.database.note.Note" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -46,6 +46,7 @@
                 android:layout_margin="@dimen/_10sdp"
                 android:visibility="gone"
                 android:scaleType="center"
+                android:contentDescription="@string/button_check"
                 android:backgroundTint="#00000000"
                 android:foreground="?selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_baseline_check_24"
@@ -113,7 +114,7 @@
                     android:id="@+id/dropdownCategories"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="Categories"
+                    android:hint="@string/categories"
                     android:text='@{data.categoriesName}'
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/etTitle" />

@@ -7,7 +7,7 @@
 
         <variable
             name="data"
-            type="com.bennohan.mynotes.database.Note" />
+            type="com.bennohan.mynotes.database.note.Note" />
 
         <import type="android.view.View" />
 
@@ -74,6 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_50sdp"
                 android:layout_marginTop="@dimen/_15sdp"
+                android:contentDescription="@string/note_image"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvNote"
                 android:visibility="gone"
@@ -84,6 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/_15sdp"
                 android:layout_marginEnd="@dimen/_10sdp"
+                android:contentDescription="@string/calendar_icon"
                 android:src="@drawable/ic_baseline_date_range_24"
                 app:layout_constraintEnd_toStartOf="@+id/tvDate"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -102,6 +104,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="@string/favourite_note_icon"
                 android:src="@drawable/ic_baseline_favorite_24"
                 android:visibility='@{data.favorite ? View.VISIBLE : View.GONE}'
                 app:layout_constraintBottom_toBottomOf="parent"

@@ -1,4 +1,4 @@
-package com.bennohan.mynotes.database
+package com.bennohan.mynotes.database.user
 
 
 import androidx.room.Entity

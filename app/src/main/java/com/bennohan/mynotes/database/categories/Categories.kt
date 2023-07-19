@@ -1,6 +1,5 @@
-package com.bennohan.mynotes.database
+package com.bennohan.mynotes.database.categories
 
-import androidx.room.Entity
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 

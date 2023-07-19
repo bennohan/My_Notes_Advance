@@ -2,11 +2,7 @@ package com.bennohan.mynotes.ui.categoryNote
 
 import android.app.AlertDialog
 import android.content.DialogInterface
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
@@ -15,21 +11,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bennohan.mynotes.R
 import com.bennohan.mynotes.base.BaseActivity
-import com.bennohan.mynotes.database.Categories
-import com.bennohan.mynotes.database.Const
-import com.bennohan.mynotes.database.Note
+import com.bennohan.mynotes.database.categories.Categories
 import com.bennohan.mynotes.databinding.ActivityCategoryBinding
 import com.bennohan.mynotes.databinding.ItemCategoryBinding
-import com.bennohan.mynotes.databinding.ItemNoteBinding
-import com.bennohan.mynotes.ui.addNote.NoteActivity
-import com.bennohan.mynotes.ui.home.NavigationActivity
-import com.bennohan.mynotes.ui.login.LoginActivity
 import com.crocodic.core.api.ApiStatus
 import com.crocodic.core.base.adapter.ReactiveListAdapter
-import com.crocodic.core.extension.openActivity
 import com.crocodic.core.extension.snacked
 import com.crocodic.core.extension.textOf
-import com.crocodic.core.extension.tos
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -38,10 +26,7 @@ class CategoryActivity :
     BaseActivity<ActivityCategoryBinding, CategoryViewModel>(R.layout.activity_category) {
 
     private var dataCategories = ArrayList<Categories?>()
-    private var idCategories: String? = null
 
-
-    //TODO TEST GETCATEGORIES SUCCESS
     private val adapterCategory by lazy {
         object : ReactiveListAdapter<ItemCategoryBinding, Categories>(R.layout.item_category) {
             override fun onBindViewHolder(
@@ -126,9 +111,6 @@ class CategoryActivity :
                     viewModel.listCategory.collect { data ->
                         dataCategories.addAll(data)
                         adapterCategory.submitList(data)
-                        Log.d("cek categories", dataCategories.toString())
-                        Log.d("cek it", data.toString())
-
                     }
                 }
             }
@@ -139,7 +121,7 @@ class CategoryActivity :
     private fun deleteCategories(categoriesId: String?) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Delete Category")
-        builder.setMessage("Apakah Anda yakin ingin menghapus categori ini?")
+        builder.setMessage(R.string.delete_categories_message)
             .setCancelable(false)
             .setPositiveButton("Delete") { _, _ ->
                 // Delete selected note from database
@@ -166,12 +148,13 @@ class CategoryActivity :
     private fun dialogEditCategories(categoriesId: String?) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Edit Categories")
+        builder.setMessage(R.string.dialog_categories_message)
 
-// Set the EditText field
+        // Set the EditText field
         val inputEditText = EditText(this)
         builder.setView(inputEditText)
 
-// Set the positive button ("Yes")
+        // Set the positive button ("Yes")
         builder.setPositiveButton("Yes") { dialog, _ ->
             val enteredText = inputEditText.text.toString()
             // Perform actions based on the entered text
@@ -179,7 +162,7 @@ class CategoryActivity :
             dialog.dismiss()
         }
 
-// Set the negative button ("No")
+        // Set the negative button ("No")
         builder.setNegativeButton("No") { dialog, _ ->
             dialog.dismiss()
         }
@@ -200,16 +183,12 @@ class CategoryActivity :
         binding.etCategory.doOnTextChanged { text, _, _, _ ->
             if (text!!.isNotEmpty()) {
                 val filter = dataCategories.filter {
-                    it?.category?.contains("$text",
-                        true) == true
+                    it?.category?.contains(
+                        "$text",
+                        true
+                    ) == true
                 }
                 adapterCategory.submitList(filter)
-
-//                if (filter == null){
-//                    binding.btnAddCategory.visibility = View.VISIBLE
-//                } else {
-//                    binding.btnAddCategory.visibility = View.GONE
-//                }
 
             } else {
                 adapterCategory.submitList(dataCategories)

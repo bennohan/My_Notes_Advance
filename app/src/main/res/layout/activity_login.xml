@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_20sdp"
             android:fontFamily="@font/inter_medium_500"
-            android:text="Email or phone number"
+            android:text="@string/email_or_phone_number"
             android:textColor="@color/black"
             android:layout_marginTop="@dimen/_20sdp"
             android:textSize="@dimen/_10sdp"
@@ -58,7 +58,8 @@
             android:textSize="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_5sdp"
             app:layout_constraintTop_toBottomOf="@+id/tv2"
-            tools:layout_editor_absoluteX="28dp" />
+            tools:layout_editor_absoluteX="28dp"
+            android:inputType="text"/>
 
         <TextView
             android:id="@+id/tv3"
@@ -66,7 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_20sdp"
             android:fontFamily="@font/inter_medium_500"
-            android:text="Password"
+            android:text="@string/password"
             android:textColor="@color/black"
             android:layout_marginTop="@dimen/_20sdp"
             android:textSize="@dimen/_10sdp"
@@ -92,7 +93,7 @@
                 android:padding="@dimen/_10sdp"
                 android:inputType="textPassword"
                 android:singleLine="true"
-                android:hint="Enter your password"
+                android:hint="@string/enter_your_password"
                 android:background="@drawable/edit_text_background" />
 
 
@@ -104,7 +105,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_5sdp"
             android:layout_marginEnd="@dimen/_20sdp"
-            android:text="Forgot password ?"
+            android:text="@string/forgot_password"
             android:textSize="@dimen/_10sdp"
             android:textColor="@color/mainColor"
             android:fontFamily="@font/inter_semibold_600"
@@ -121,7 +122,7 @@
             android:background="@drawable/edit_text_background"
             android:backgroundTint="@color/mainColor"
             android:fontFamily="@font/inter_extrabold_800"
-            android:text="Login"
+            android:text="@string/login"
             android:textAllCaps="false"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
@@ -132,7 +133,7 @@
             android:id="@+id/tvOption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Don’t have an account? Sign Up ?"
+            android:text="@string/don_t_have_an_account_sign_up"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="@dimen/_20sdp"
             android:fontFamily="@font/inter_semibold_600"
@@ -149,7 +150,7 @@
             android:layout_marginEnd="@dimen/_20sdp"
             android:layout_marginTop="@dimen/_10sdp"
             android:fontFamily="@font/inter_extrabold_800"
-            android:text="Login with Biometric"
+            android:text="@string/login_with_biometric"
             android:textAllCaps="false"
             android:textColor="@color/profileColor"
             app:layout_constraintTop_toBottomOf="@+id/tvOrLoginWith" />
@@ -159,7 +160,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/inter_semibold_600"
-            android:text="Or Login With"
             android:textSize="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_10sdp"
             app:layout_constraintEnd_toEndOf="parent"

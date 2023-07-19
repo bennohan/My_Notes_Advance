@@ -14,7 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bennohan.mynotes.R
 import com.bennohan.mynotes.base.BaseActivity
-import com.bennohan.mynotes.database.Const
+import com.bennohan.mynotes.database.constant.Const
 import com.bennohan.mynotes.databinding.ActivityLoginBinding
 import com.bennohan.mynotes.ui.editPassword.EditPasswordActivity
 import com.bennohan.mynotes.ui.home.NavigationActivity
@@ -42,6 +42,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(R.layou
         tvRegister()
         observe()
 
+        //Biometric button Visibility condition
         binding.btnLoginBiometric.isVisible = session.getBoolean(Const.BIOMETRIC.BIOMETRIC)
         binding.tvOrLoginWith.isVisible = session.getBoolean(Const.BIOMETRIC.BIOMETRIC)
 
@@ -67,16 +68,22 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(R.layou
         viewModel.login(emailOrPhone, password)
     }
 
-    private fun tvRegister(){
+    private fun tvRegister() {
         val spannableString = SpannableString("Don't Have an Account? Register Now")
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(view: View) {
                 openActivity<RegisterActivity>()
             }
         }
-        spannableString.setSpan(clickableSpan, 23, spannableString.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spannableString.setSpan(
+            clickableSpan,
+            23,
+            spannableString.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
         binding.tvOption.text = spannableString
-        binding.tvOption.movementMethod = LinkMovementMethod.getInstance() // Required for clickable spans to work
+        binding.tvOption.movementMethod =
+            LinkMovementMethod.getInstance() // Required for clickable spans to work
 
     }
 
@@ -90,11 +97,15 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(R.layou
         val promptInfo = builder.build()
 
         val biometricPrompt = initBiometricPrompt {
-            viewModel.login(session.getString(Const.LOGIN.EMAIL_PHONE), session.getString(Const.LOGIN.PASSWORD))
+            viewModel.login(
+                session.getString(Const.LOGIN.EMAIL_PHONE),
+                session.getString(Const.LOGIN.PASSWORD)
+            )
         }
 
         biometricPrompt.authenticate(promptInfo)
     }
+
     private fun initBiometricPrompt(listener: (Boolean) -> Unit): BiometricPrompt {
         //Get executor running on main thread.
         val executor = ContextCompat.getMainExecutor(this)
@@ -121,7 +132,6 @@ class LoginActivity : BaseActivity<ActivityLoginBinding, LoginViewModel>(R.layou
         return BiometricPrompt(this, executor, callback)
 
     }
-
 
 
     private fun observe() {

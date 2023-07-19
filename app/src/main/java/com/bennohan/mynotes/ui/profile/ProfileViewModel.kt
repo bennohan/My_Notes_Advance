@@ -3,9 +3,8 @@ package com.bennohan.mynotes.ui.profile
 import androidx.lifecycle.viewModelScope
 import com.bennohan.mynotes.api.ApiService
 import com.bennohan.mynotes.base.BaseViewModel
-import com.bennohan.mynotes.database.Const
-import com.bennohan.mynotes.database.User
-import com.bennohan.mynotes.database.UserDao
+import com.bennohan.mynotes.database.user.User
+import com.bennohan.mynotes.database.user.UserDao
 import com.crocodic.core.api.ApiCode
 import com.crocodic.core.api.ApiObserver
 import com.crocodic.core.api.ApiResponse

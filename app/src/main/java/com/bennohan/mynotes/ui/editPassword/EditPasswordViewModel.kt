@@ -3,13 +3,9 @@ package com.bennohan.mynotes.ui.editPassword
 import androidx.lifecycle.viewModelScope
 import com.bennohan.mynotes.api.ApiService
 import com.bennohan.mynotes.base.BaseViewModel
-import com.bennohan.mynotes.database.Const
-import com.bennohan.mynotes.database.User
-import com.bennohan.mynotes.database.UserDao
-import com.crocodic.core.api.ApiCode
+import com.bennohan.mynotes.database.user.UserDao
 import com.crocodic.core.api.ApiObserver
 import com.crocodic.core.api.ApiResponse
-import com.crocodic.core.extension.toObject
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

@@ -1,6 +1,5 @@
-package com.bennohan.mynotes.database
+package com.bennohan.mynotes.database.user
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
 import com.crocodic.core.data.CoreDao

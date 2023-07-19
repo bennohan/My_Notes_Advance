@@ -1,4 +1,4 @@
-package com.bennohan.mynotes.database
+package com.bennohan.mynotes.database.constant
 
 object Const {
     object TOKEN {
@@ -13,5 +13,8 @@ object Const {
     }
     object BIOMETRIC {
         const val BIOMETRIC ="biometric"
+    }
+    object TIMEOUT {
+        const val NINETY_LONG = 90L
     }
 }

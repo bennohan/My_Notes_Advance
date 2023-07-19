@@ -1,4 +1,4 @@
-package com.bennohan.mynotes.database
+package com.bennohan.mynotes.database.note
 
 import androidx.room.Entity
 import com.google.gson.annotations.Expose

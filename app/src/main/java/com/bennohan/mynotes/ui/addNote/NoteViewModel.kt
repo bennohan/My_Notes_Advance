@@ -1,17 +1,13 @@
 package com.bennohan.mynotes.ui.addNote
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.bennohan.mynotes.api.ApiService
 import com.bennohan.mynotes.base.BaseViewModel
-import com.bennohan.mynotes.database.Categories
-import com.bennohan.mynotes.database.Note
-import com.bennohan.mynotes.database.User
-import com.bennohan.mynotes.database.UserDao
+import com.bennohan.mynotes.database.categories.Categories
+import com.bennohan.mynotes.database.note.Note
 import com.crocodic.core.api.ApiCode
 import com.crocodic.core.api.ApiObserver
 import com.crocodic.core.api.ApiResponse
-import com.crocodic.core.data.CoreSession
 import com.crocodic.core.extension.toList
 import com.crocodic.core.extension.toObject
 import com.google.gson.Gson
@@ -30,8 +26,6 @@ import javax.inject.Inject
 class NoteViewModel @Inject constructor(
     private val apiService: ApiService,
     private val gson: Gson,
-    private val session: CoreSession,
-    private val userDao: UserDao
 ) : BaseViewModel() {
 
     private var _listCategory = MutableSharedFlow<List<Categories?>>()
@@ -40,14 +34,11 @@ class NoteViewModel @Inject constructor(
     private var _dataNote = MutableSharedFlow<Note?>()
     var dataNote = _dataNote.asSharedFlow()
 
-    private var _categoriesName = MutableSharedFlow<Categories?>()
-    var categoriesName = _categoriesName.asSharedFlow()
-
 
     fun createNote(
-        title : String?,
-        content : String?,
-        categoriesId : String?,
+        title: String?,
+        content: String?,
+        categoriesId: String?,
     ) = viewModelScope.launch {
         _apiResponse.emit(ApiResponse().responseLoading())
         ApiObserver(
@@ -56,7 +47,6 @@ class NoteViewModel @Inject constructor(
             object : ApiObserver.ResponseListener {
                 override suspend fun onSuccess(response: JSONObject) {
                     val data = response.getJSONObject(ApiCode.DATA).toObject<Note>(gson)
-                    Log.d("cek list",data.toString())
                     _dataNote.emit(data)
                     _apiResponse.emit(ApiResponse().responseSuccess("Note Created"))
 
@@ -72,15 +62,15 @@ class NoteViewModel @Inject constructor(
 
     fun createNotePhoto(
         name: String?,
-        content : String?,
-        categoriesId : String?,
+        content: String?,
+        categoriesId: String?,
         photo: File
     ) = viewModelScope.launch {
         val fileBody = photo.asRequestBody("multipart/form-data".toMediaTypeOrNull())
         val filePart = MultipartBody.Part.createFormData("photo", photo.name, fileBody)
         _apiResponse.emit(ApiResponse().responseLoading())
         ApiObserver(
-            { apiService.createNotePhoto(name,content,categoriesId,filePart) },
+            { apiService.createNotePhoto(name, content, categoriesId, filePart) },
             false,
             object : ApiObserver.ResponseListener {
                 override suspend fun onSuccess(response: JSONObject) {
@@ -108,7 +98,7 @@ class NoteViewModel @Inject constructor(
             object : ApiObserver.ResponseListener {
                 override suspend fun onSuccess(response: JSONObject) {
                     val data = response.getJSONArray(ApiCode.DATA).toList<Categories>(gson)
-                    Log.d("cek list category",data.toString())
+
                     _listCategory.emit(data)
                     _apiResponse.emit(ApiResponse().responseSuccess())
                 }
@@ -121,31 +111,9 @@ class NoteViewModel @Inject constructor(
             })
     }
 
-    fun getCategoriesById(
-        categoriesId : String
-    ) = viewModelScope.launch {
-        _apiResponse.emit(ApiResponse().responseLoading())
-        ApiObserver(
-            { apiService.categoryId(categoriesId) },
-            false,
-            object : ApiObserver.ResponseListener {
-                override suspend fun onSuccess(response: JSONObject) {
-                    val data = response.getJSONObject(ApiCode.DATA).toObject<Categories>(gson)
-                    Log.d("cek list category",data.toString())
-                    _categoriesName.emit(data)
-                    _apiResponse.emit(ApiResponse().responseSuccess())
-                }
-
-                override suspend fun onError(response: ApiResponse) {
-                    //Ask why the response wont show if the super is gone
-                    super.onError(response)
-                    _apiResponse.emit(ApiResponse().responseError())
-                }
-            })
-    }
 
     fun getNote(
-        noteId : String
+        noteId: String
     ) = viewModelScope.launch {
         _apiResponse.emit(ApiResponse().responseLoading())
         ApiObserver(
@@ -154,7 +122,6 @@ class NoteViewModel @Inject constructor(
             object : ApiObserver.ResponseListener {
                 override suspend fun onSuccess(response: JSONObject) {
                     val data = response.getJSONObject(ApiCode.DATA).toObject<Note>(gson)
-                    Log.d("cek list",data.toString())
                     _apiResponse.emit(ApiResponse().responseSuccess())
                     _dataNote.emit(data)
                 }
@@ -167,9 +134,8 @@ class NoteViewModel @Inject constructor(
             })
     }
 
-    //TODO TEST UPDATE FAV TANPA GETNOTE LG
     fun favouriteNote(
-        noteId : String?
+        noteId: String?
     ) = viewModelScope.launch {
         _apiResponse.emit(ApiResponse().responseLoading())
         ApiObserver(
@@ -189,7 +155,7 @@ class NoteViewModel @Inject constructor(
     }
 
     fun unFavouriteNote(
-        noteId : String?
+        noteId: String?
     ) = viewModelScope.launch {
         _apiResponse.emit(ApiResponse().responseLoading())
         ApiObserver(
@@ -208,14 +174,14 @@ class NoteViewModel @Inject constructor(
     }
 
     fun editNote(
-        noteId : String?,
-        title : String?,
-        content : String?,
-        categoriesId : String?,
+        noteId: String?,
+        title: String?,
+        content: String?,
+        categoriesId: String?,
     ) = viewModelScope.launch {
         _apiResponse.emit(ApiResponse().responseLoading())
         ApiObserver(
-            { apiService.editNote(noteId,title, content, categoriesId) },
+            { apiService.editNote(noteId, title, content, categoriesId) },
             false,
             object : ApiObserver.ResponseListener {
                 override suspend fun onSuccess(response: JSONObject) {
@@ -232,17 +198,17 @@ class NoteViewModel @Inject constructor(
     }
 
     fun editNotePhoto(
-        noteId : String?,
+        noteId: String?,
         title: String?,
-        content : String?,
-        categoriesId : String?,
+        content: String?,
+        categoriesId: String?,
         photo: File
     ) = viewModelScope.launch {
         val fileBody = photo.asRequestBody("multipart/form-data".toMediaTypeOrNull())
         val filePart = MultipartBody.Part.createFormData("photo", photo.name, fileBody)
         _apiResponse.emit(ApiResponse().responseLoading())
         ApiObserver(
-            { apiService.editNotePhoto(noteId,title,content,categoriesId,filePart) },
+            { apiService.editNotePhoto(noteId, title, content, categoriesId, filePart) },
             false,
             object : ApiObserver.ResponseListener {
                 override suspend fun onSuccess(response: JSONObject) {
@@ -261,9 +227,8 @@ class NoteViewModel @Inject constructor(
     }
 
 
-
     fun deleteNote(
-        noteId : String?
+        noteId: String?
     ) = viewModelScope.launch {
         _apiResponse.emit(ApiResponse().responseLoading())
         ApiObserver(

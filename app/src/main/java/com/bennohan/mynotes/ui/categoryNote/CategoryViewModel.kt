@@ -4,8 +4,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.bennohan.mynotes.api.ApiService
 import com.bennohan.mynotes.base.BaseViewModel
-import com.bennohan.mynotes.database.Categories
-import com.bennohan.mynotes.database.UserDao
+import com.bennohan.mynotes.database.categories.Categories
 import com.crocodic.core.api.ApiCode
 import com.crocodic.core.api.ApiObserver
 import com.crocodic.core.api.ApiResponse
@@ -23,7 +22,6 @@ import javax.inject.Inject
 class CategoryViewModel  @Inject constructor(
     private val apiService: ApiService,
     private val gson: Gson,
-    private val userDao: UserDao
 ) : BaseViewModel() {
 
     private var _listCategory = MutableSharedFlow<List<Categories?>>()
@@ -39,9 +37,7 @@ class CategoryViewModel  @Inject constructor(
             object : ApiObserver.ResponseListener {
                 override suspend fun onSuccess(response: JSONObject) {
                     val data = response.getJSONArray(ApiCode.DATA).toList<Categories>(gson)
-                    Log.d("cek list category",data.toString())
                     _listCategory.emit(data)
-//                    _apiResponse.emit(ApiResponse().responseSuccess())
                 }
 
                 override suspend fun onError(response: ApiResponse) {
@@ -61,9 +57,6 @@ class CategoryViewModel  @Inject constructor(
             false,
             object : ApiObserver.ResponseListener {
                 override suspend fun onSuccess(response: JSONObject) {
-                    val data = response.getJSONObject(ApiCode.DATA).toObject<Categories>(gson)
-                    Log.d("cek list category",data.toString())
-//                    _listCategory.emit(data)
                     _apiResponse.emit(ApiResponse().responseSuccess())
                 }
 

@@ -2,9 +2,7 @@ package com.bennohan.mynotes.ui.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -12,9 +10,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bennohan.mynotes.R
 import com.bennohan.mynotes.base.BaseFragment
-import com.bennohan.mynotes.database.Const
-import com.bennohan.mynotes.database.Note
-import com.bennohan.mynotes.database.UserDao
+import com.bennohan.mynotes.database.OpenNavigation
+import com.bennohan.mynotes.database.constant.Const
+import com.bennohan.mynotes.database.note.Note
+import com.bennohan.mynotes.database.user.UserDao
 import com.bennohan.mynotes.databinding.FragmentHomeBinding
 import com.bennohan.mynotes.databinding.ItemNoteBinding
 import com.bennohan.mynotes.ui.addNote.NoteActivity
@@ -23,20 +22,18 @@ import com.crocodic.core.base.adapter.ReactiveListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import okhttp3.internal.format
-import java.text.SimpleDateFormat
-import java.util.*
+import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
-//TODO GAMBAR DI ITEM NOTE
 class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     private val viewModel by activityViewModels<HomeViewModel>()
 
     @Inject
     lateinit var userDao: UserDao
+
     private var dataNote = ArrayList<Note?>()
 
 
@@ -61,7 +58,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                     val color = colorList[colorIndex]
 
                     holder.binding.constraint.setBackgroundResource(color)
-                    Log.d("cek color", color.toString())
 
 
                     holder.binding.constraint.setOnClickListener {
@@ -73,7 +69,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                         (requireActivity() as NavigationActivity).activityLauncher.launch(intent) {
                             // IF Result
                             if (it.resultCode == 6100) {
-                                android.util.Log.d("result Code","success")
                                 getNote()
                                 observe()
                             }
@@ -108,8 +103,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
 
         binding?.btnMenu?.setOnClickListener {
-            val activity = requireActivity() as NavigationActivity
-            activity.sideMenu()
+            EventBus.getDefault().post(OpenNavigation())
         }
 
 
@@ -169,12 +163,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                 launch {
                     //TODO The different between collect and collect latest
                     viewModel.listNote.collectLatest { listNote ->
-                        android.util.Log.d("cek list observe", listNote.toString())
                         adapterNote.submitList(listNote)
                         dataNote.clear()
                         dataNote.addAll(listNote)
-
-
                     }
                 }
             }

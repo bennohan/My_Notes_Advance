@@ -1,15 +1,7 @@
 package com.bennohan.mynotes.api
 
 import okhttp3.MultipartBody
-import retrofit2.http.DELETE
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.GET
-import retrofit2.http.Multipart
-import retrofit2.http.POST
-import retrofit2.http.Part
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface ApiService {
 
@@ -140,13 +132,5 @@ interface ApiService {
 
     @GET("category/index")
     suspend fun categoryList(): String
-
-    @GET("category/{categories_id}")
-    suspend fun categoryId(
-        @Path("categories_id") categoriesId: String?
-    ): String
-
-
-
 
 }

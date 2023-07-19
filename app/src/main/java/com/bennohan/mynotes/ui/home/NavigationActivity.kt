@@ -3,13 +3,11 @@ package com.bennohan.mynotes.ui.home
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -18,8 +16,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bennohan.mynotes.R
-import com.bennohan.mynotes.database.User
-import com.bennohan.mynotes.database.UserDao
+import com.bennohan.mynotes.database.OpenNavigation
+import com.bennohan.mynotes.database.user.User
+import com.bennohan.mynotes.database.user.UserDao
 import com.bennohan.mynotes.databinding.ActivityNavigationBinding
 import com.bennohan.mynotes.ui.addNote.NoteActivity
 import com.bennohan.mynotes.ui.biometric.SettingActivity
@@ -36,8 +35,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layout.activity_navigation) {
 
@@ -49,21 +51,17 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
 
     private  var user : User? = null
 
-//    private  var icon : String? = null
-
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
 
-    val fragmentManager = supportFragmentManager
-    val fragment = fragmentManager.findFragmentById(R.id.home_fragment) as? HomeFragment
+    private val fragmentManager = supportFragmentManager
+    private val fragment = fragmentManager.findFragmentById(R.id.home_fragment) as? HomeFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         drawerLayout = binding.drawerLayout
         navView = binding.navigationView
-
-//        biometric()
 
 
         binding.btnAddNote.setOnClickListener {
@@ -75,8 +73,6 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     userDao.getUser().collect{
-                        Log.d("cek user Nav", it.toString())
-//                        icon = it.photo
                         user = it
                         sideMenu()
                     }
@@ -102,15 +98,6 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
             }
         }
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    userDao.getUser().collect{
-
-                    }
-                }
-            }
-        }
 
     }
 
@@ -212,13 +199,15 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
             }
         }
 
-//        homeFragment.id.btnMenu?.setOnClickListener {
-//            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-//                drawerLayout.closeDrawer(GravityCompat.START)
-//            } else {
-//                drawerLayout.openDrawer(GravityCompat.START)
-//            }
-//        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+     fun condition( openNavigation: OpenNavigation ){
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
     }
 
     // Handle ActionBarDrawerToggle click event
@@ -244,8 +233,8 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
     private fun logout() {
 
         val builder = AlertDialog.Builder(this@NavigationActivity)
-        builder.setTitle("Log Out")
-        builder.setMessage("Anda yakin ingin keluar dari aplikasi ini? Jika keluar semua data anda akan dihapus dari perangkat ini.")
+        builder.setTitle("Logout")
+        builder.setMessage(R.string.logout_message)
             .setCancelable(false)
             .setPositiveButton("Logout") { _, _ ->
                 // Delete selected note from database
@@ -270,22 +259,5 @@ class NavigationActivity : NoViewModelActivity<ActivityNavigationBinding>(R.layo
         dialog.show()
 
     }
-
-
-
-//    private fun biometric(){
-//        val biometricManager = BiometricManager.from(this)
-//        when (biometricManager.canAuthenticate()) {
-//            BiometricManager.BIOMETRIC_SUCCESS -> {
-//                // Biometric authentication is available
-//            }
-//            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE,
-//            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE,
-//            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-//                // Biometric authentication is not available or no biometric credentials enrolled
-//            }
-//            // Handle other error cases if needed
-//        }
-//    }
 
 }

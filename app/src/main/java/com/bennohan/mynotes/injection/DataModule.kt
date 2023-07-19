@@ -3,7 +3,7 @@ package com.bennohan.mynotes.injection
 import android.content.Context
 import com.bennohan.mynotes.api.ApiService
 import com.bennohan.mynotes.database.AppDatabase
-import com.bennohan.mynotes.database.Const
+import com.bennohan.mynotes.database.constant.Const
 import com.crocodic.core.data.CoreSession
 import com.crocodic.core.helper.okhttp.SSLTrust
 import com.google.gson.FieldNamingPolicy
@@ -42,7 +42,7 @@ class DataModule {
 
     @Singleton
     @Provides
-    fun provideAppDatabse(@ApplicationContext context: Context) = AppDatabase.getDatabase(context)
+    fun provideAppDatabase(@ApplicationContext context: Context) = AppDatabase.getDatabase(context)
 
     @Singleton
     @Provides
@@ -54,9 +54,9 @@ class DataModule {
 
         val okHttpClient = OkHttpClient().newBuilder()
             .sslSocketFactory(sslContext.socketFactory, unSafeTrustManager)
-            .connectTimeout(90, TimeUnit.SECONDS)
-            .readTimeout(90, TimeUnit.SECONDS)
-            .writeTimeout(90, TimeUnit.SECONDS)
+            .connectTimeout(Const.TIMEOUT.NINETY_LONG, TimeUnit.SECONDS)
+            .readTimeout(Const.TIMEOUT.NINETY_LONG, TimeUnit.SECONDS)
+            .writeTimeout(Const.TIMEOUT.NINETY_LONG, TimeUnit.SECONDS)
 
             .addInterceptor { chain ->
                 val original = chain.request()
@@ -83,7 +83,7 @@ class DataModule {
     @Provides
     fun provideApiService(okHttpClient: OkHttpClient): ApiService {
         return Retrofit.Builder()
-            .baseUrl("https://magang.crocodic.net/ki/Rainer/KI_Advance_MyNote/public/api/")
+            .baseUrl(com.bennohan.mynotes.BuildConfig.API_URL)
             .addConverterFactory(ScalarsConverterFactory.create())
 //            .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
